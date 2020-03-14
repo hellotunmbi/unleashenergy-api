@@ -27,8 +27,5 @@
     "dev": "nodemon server.js"
   },
   "author": "",
-  "license": "ISC",
-  "engines": {
-    "node": "6.11.1"
-  }
+  "license": "ISC"
 }
