@@ -3,7 +3,7 @@ const router = express.Router();
 
 const verifyController = require("../controllers/verify.controller");
 
-// CONFIRM USER ACCOUNT...
+// CONFIRM USER ACCOUNT..
 router.get("/:id", verifyController.confirmUserAccount);
 
 module.exports = router;
