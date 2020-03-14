@@ -1,9 +1,16 @@
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const authCtrl = require("./user.controller");
+const authCtrl = require("../routes/user.route");
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+const bitcore = require("bitcore-lib");
+
+const Address = bitcore.Address;
+const PrivateKey = bitcore.PrivateKey;
+const PublicKey = bitcore.PublicKey;
+const Networks = bitcore.Networks;
 
 // REGISTER...
 exports.register = async function(req, res) {
@@ -12,32 +19,23 @@ exports.register = async function(req, res) {
 
   // Generate wallet and investment addresses
   const wallet = await this.generateAddress();
-  const investment = await this.generateAddress();
-
-  const walletKey = wallet.pkey;
 
   try {
     const userData = {
       fullname,
       email,
-      wallet: wallet,
-      investment: investment,
       status,
-      wkey: walletKey
+      wallet
     };
 
     let user = new User(userData);
-
-    // res.json({
-    //   status: 200,
-    //   data: user
-    // });
 
     await User.register(user, req.body.password);
     const id = user._id;
 
     const token = jwt.sign(
       {
+        id,
         fullname,
         email
       },
@@ -45,7 +43,7 @@ exports.register = async function(req, res) {
       { expiresIn: "1w" }
     );
 
-    const hostURL = "https://mycrypto-api.herokuapp.com/api/verify/";
+    const hostURL = "https://purpcoin-api.herokuapp.com/api/verify/";
 
     //Send verification email...
     const msg = {
@@ -55,7 +53,7 @@ exports.register = async function(req, res) {
         name: "Purple Coin Investment"
       },
       subject: "Verify Your Email - PurpCoinInvest",
-      text: "Welcome to PurpCoin Invest App",
+      text: "PurpCoin Invest App - Confirm Your Email",
       html: `Dear ${fullname},<br/><br/>
     				We have received your request to create an account on PurpCoin Invest App.<br/><br/>
     				Kindly confirm your email to complete your registration process by clicking the button below:<br/><br/>
@@ -81,7 +79,6 @@ exports.register = async function(req, res) {
     });
   }
 };
-
 
 // LOGIN...
 exports.login = (req, res, next) => {
@@ -138,3 +135,42 @@ exports.login = (req, res, next) => {
     }
   })(req, res, next);
 };
+
+generateAddress = () => {
+  var privateKey = PrivateKey();
+  var publicKey = PublicKey(privateKey);
+  var addressRaw = Address(publicKey, Networks.livenet);
+  let address = addressRaw.toString();
+
+  // console.log("Private Key", privateKey.bn);
+
+  data = {
+    privateKey: privateKey.bn.toString(),
+    accountNo: address
+  };
+
+  return data;
+};
+
+function sendEmail() {
+  const { email, fullname } = req.body;
+  const msg = {
+    to: email,
+    from: {
+      email: "support@purpcoininvest.com",
+      name: "Purple Coin Investment"
+    },
+    subject: "Verify Your Email - PurpCoinInvest",
+    text: "PurpCoin Invest App - Confirm Your Email",
+    html: `Dear ${fullname},<br/><br/>
+    				We have received your request to create an account on PurpCoin Invest App.<br/><br/>
+    				Kindly confirm your email to complete your registration process by clicking the button below:<br/><br/>
+    				<a href="#"><button style="padding: 1rem 2rem; font-size: 1rem; background-color: rgba(83, 28, 179, 0.57); color: #FFFFFF; border-radius: 4px">Verify Email</button></a>`
+  };
+  sgMail.send(msg);
+
+  res.json({
+    status: 200,
+    message: "Mail sent successfully!!"
+  });
+}
