@@ -16,28 +16,34 @@ exports.confirmUserAccount = (req, res) => {
         if (err) {
           res.send('<h3 style="margin: 2rem;"> Unable to verify email </h3>');
         } else {
-          const { fullname, email } = user;
+          if (!user) {
+            res.send(
+              '<h3 style="margin: 2rem;">Your email has already been verified</h3>'
+            );
+          } else {
+            const { fullname, email } = user;
 
-          const msg = {
-            to: email,
-            from: {
-              name: "Purple Coin Investment",
-              email: "support@purpcoininvest.com"
-            },
-            subject: "Welcome to PurpCoin Invest",
-            text: "Welcome to Purple Coin Investment",
-            html: `<div><img src="https://res.cloudinary.com/dlfaitrcf/image/upload/v1580859728/man-in-blue-suit-999267_g5wkho.jpg" /></div><br/>
+            const msg = {
+              to: email,
+              from: {
+                name: "Purple Coin Investment",
+                email: "support@purpcoininvest.com"
+              },
+              subject: "Welcome to PurpCoin Invest",
+              text: "Welcome to Purple Coin Investment",
+              html: `<div><img src="https://res.cloudinary.com/dlfaitrcf/image/upload/v1580859728/man-in-blue-suit-999267_g5wkho.jpg" /></div><br/>
 						Howdy ${fullname},<br/><br/>
 						Yippee!! You have been successfully registered on the PurpCoin Investment app.<br/><br/>
 						You can begin your cryptocurrency investment right from the app.<br/><br/> <br/><br/>
 						Yours,<br/><br/>
 						<strong>Purple Coin Investment</strong>`
-          };
-          sgMail.send(msg);
+            };
+            sgMail.send(msg);
 
-          res.send(
-            '<h3 style="margin: 2rem;"> Email Successfully Verified.<br/>You can login to the PurpCoinInvest app</h3>'
-          );
+            res.send(
+              '<h3 style="margin: 2rem;"> Email Successfully Verified.<br/>You can login to the PurpCoinInvest app</h3>'
+            );
+          }
           // res.json(user);
         }
       }
