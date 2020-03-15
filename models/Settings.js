@@ -19,9 +19,13 @@ const settingsSchema = new Schema({
   bitcoin: {
     btcAddress: { type: String }
   },
-  plans: [
-      { investAmount: String, profit: String, duration: Number }
-  ],
+  plans: [{ investAmount: String, profit: String, duration: Number }],
+  adminEmail: {
+    type: String,
+    required: true,
+    trim: true,
+    validate: [validator.isEmail, "Invalid Admin Email"]
+  },
   created_at: Date,
   updated_at: Date
 });

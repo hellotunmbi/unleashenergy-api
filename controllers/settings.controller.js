@@ -69,7 +69,7 @@ exports.updateBankDetails = (req, res) => {
 // ===============================
 
 exports.getBitcoin = (req, res) => {
-  Settings.findOne({ name: settingsKey }, function(err, bankDetails) {
+  Settings.findOne({ name: settingsKey }, function(err, bitcoinDetails) {
     if (err) {
       res.json({
         status: 400,
@@ -80,7 +80,7 @@ exports.getBitcoin = (req, res) => {
         status: 200,
         data: {
           message: "Bitcoin Details Found",
-          bankDetails: bankDetails["bitcoin"]
+          bitcoinDetails: bitcoinDetails["bitcoin"]
         }
       });
     }
