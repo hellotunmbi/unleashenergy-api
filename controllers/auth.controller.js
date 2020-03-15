@@ -89,6 +89,9 @@ exports.login = (req, res, next) => {
 
     const { fullname, email, status } = user;
     const id = user._id;
+    user.hash = "";
+    user.salt = "";
+    user["wallet"].privateKey = "";
 
     if (!user) {
       res.json({
