@@ -30,7 +30,7 @@ exports.register = async function(req, res) {
 
     let user = new User(userData);
 
-    await User.register(user, req.body.password);
+    user = await User.register(user, req.body.password);
     const id = user._id;
 
     const token = jwt.sign(
