@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
 
 const historySchema = new Schema({
-  userid: { type: Schema.Types.ObjectId, required: true, trim: true },
+  userid: { type: String, required: true, trim: true },
   email: {
     type: String,
     trim: true,

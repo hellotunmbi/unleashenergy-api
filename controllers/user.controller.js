@@ -39,8 +39,15 @@ exports.saveHistory = (req, res) => {
   const { userid, email } = req;
   const { description, amountUSD, transactionDate } = req.body;
 
+  // res.json({
+  //   status: 200,
+  //   userid: userid,
+  //   email: email
+  // });
+  // return;
+
   let history = new History({
-    userid: id,
+    userid,
     email,
     description,
     amountUSD,
