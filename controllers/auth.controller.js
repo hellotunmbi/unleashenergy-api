@@ -32,6 +32,8 @@ exports.register = async function(req, res) {
 
     user = await User.register(user, req.body.password);
     const id = user._id;
+    console.log("id", id);
+    console.log("user", user);
 
     const token = jwt.sign(
       {
