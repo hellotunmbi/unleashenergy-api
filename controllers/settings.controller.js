@@ -14,7 +14,8 @@ exports.getBankDetails = (req, res) => {
         status: 200,
         data: {
           message: "Bank Details Found",
-          bankDetails: bankDetails["bank"]
+          bankDetails: bankDetails["bank"],
+          adminEmail: bitcoinDetails.adminEmail
         }
       });
     }
@@ -80,7 +81,8 @@ exports.getBitcoin = (req, res) => {
         status: 200,
         data: {
           message: "Bitcoin Details Found",
-          bitcoinDetails: bitcoinDetails["bitcoin"]
+          bitcoinDetails: bitcoinDetails["bitcoin"],
+          adminEmail: bitcoinDetails.adminEmail
         }
       });
     }
