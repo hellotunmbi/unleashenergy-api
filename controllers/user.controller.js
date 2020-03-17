@@ -126,7 +126,7 @@ exports.getInvestment = async (req, res) => {
 
     if (myInvestment.length === 0) {
       res.json({
-        status: 400,
+        status: 200,
         data: { message: "You dont have any active investment" }
       });
 
