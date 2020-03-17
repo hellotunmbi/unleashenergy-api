@@ -11,10 +11,10 @@ const investmentSchema = new Schema({
   currentBalance: { type: Number, required: true },
   dailyInterest: { type: Number, required: true },
   maturityPeriod: Number,
-  endDate: { type: Date, required: true },
+  endDate: { type: Date },
   modeOfPayment: String,
   status: { type: String, required: true },
-  dateInvested: Date,
+  dateActivated: Date,
   created_at: Date,
   updated_at: Date
 });

@@ -84,7 +84,7 @@ exports.saveInvestment = async (req, res) => {
     endDate,
     modeOfPayment,
     status,
-    dateInvested
+    dateActivated
   } = req.body;
 
   let newInvestment = new Investment({
@@ -97,7 +97,7 @@ exports.saveInvestment = async (req, res) => {
     endDate,
     modeOfPayment,
     status,
-    dateInvested
+    dateActivated
   });
 
   // const account;
