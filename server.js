@@ -25,6 +25,7 @@ const auth = require("./routes/auth.route");
 const user = require("./routes/user.route");
 const settings = require("./routes/settings.route");
 const verify = require("./routes/verify.route");
+const scheduler = require("./routes/scheduler.route");
 
 // ROUTES...
 app.get("/", (req, res) => {
@@ -34,6 +35,7 @@ app.use("/api/auth", auth);
 app.use("/api/user", user);
 app.use("/api/settings", settings);
 app.use("/api/verify", verify);
+app.use("/api/scheduler", scheduler);
 
 let port = 1000;
 

@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const Settings = require("../models/Settings");
 const History = require("../models/History");
 const Investment = require("../models/Investment");
 
@@ -72,7 +72,7 @@ exports.saveHistory = (req, res) => {
 };
 
 // Save Investment...
-exports.saveInvestment = (req, res) => {
+exports.saveInvestment = async (req, res) => {
   const userid = req.userid;
 
   const {
@@ -100,6 +100,12 @@ exports.saveInvestment = (req, res) => {
     dateInvested
   });
 
+  // const account;
+  // await Settings.find({name: 'mainsetting'}, function(err, settings) {
+  //   account["bank"] = settings["bank"];
+  //   account["bitcoin"] = settings["bitcoin"];
+  // });
+
   newInvestment.save(function(err) {
     if (err) {
       res.json({
@@ -107,6 +113,22 @@ exports.saveInvestment = (req, res) => {
         data: { message: "Unable to save transaction", error: err }
       });
     } else {
+      const msg = {
+        to: email,
+        from: {
+          email: "support@purpcoininvest.com",
+          name: "Purple Coin Investment"
+        },
+        subject: "Verify Your Email - PurpCoinInvest",
+        text: "Activate Your Investement - PurpCoin Invest",
+        html: `Dear ${fullname},<br/><br/>
+    				We have received your request to invest ${amtInvested} in Purple Coin Investment.<br/><br/>
+            Your investment will run for 90 days starting from the date your investment is activated:<br/><br/>
+            Activation is done by making your payment to the following account and completing the process on the app or by replying to this email with details of your payment<br/><br/>
+          `
+      };
+      sgMail.send(msg);
+
       res.json({
         status: 200,
         data: {

@@ -7,13 +7,13 @@ mongoose.Promise = global.Promise;
 const investmentSchema = new Schema({
   userid: { type: Schema.Types.ObjectId, required: true, trim: true },
   amtInvested: { type: Number, required: true },
-  daysRunning: Number,
-  currentBalance: Number,
-  dailyInterest: Number,
+  daysRunning: { type: Number, required: true },
+  currentBalance: { type: Number, required: true },
+  dailyInterest: { type: Number, required: true },
   maturityPeriod: Number,
-  endDate: Date,
+  endDate: { type: Date, required: true },
   modeOfPayment: String,
-  status: String,
+  status: { type: String, required: true },
   dateInvested: Date,
   created_at: Date,
   updated_at: Date
