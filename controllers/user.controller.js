@@ -10,14 +10,14 @@ exports.history = (req, res) => {
   History.find({ userid }, function(err, history) {
     if (err) {
       res.json({
-        status: 200,
+        status: 400,
         data: { message: "Unable to retrieve transaction history" }
       });
     }
 
     if (history.length === 0) {
       res.json({
-        status: 400,
+        status: 200,
         data: {
           message: "No transaction found"
         }
@@ -27,7 +27,7 @@ exports.history = (req, res) => {
         status: 200,
         data: {
           message: "Transactions Found",
-          transations: history
+          transactions: history
         }
       });
     }
