@@ -33,7 +33,6 @@ exports.register = async function(req, res) {
     user = await User.register(user, req.body.password);
     const id = user._id;
     console.log("id", id);
-    console.log("user", user);
 
     const token = jwt.sign(
       {
@@ -114,6 +113,7 @@ exports.login = (req, res, next) => {
     } else if (status === "verified") {
       const token = jwt.sign(
         {
+          id,
           fullname,
           email
         },
