@@ -15,7 +15,7 @@ exports.getBankDetails = (req, res) => {
         data: {
           message: "Bank Details Found",
           bankDetails: bankDetails["bank"],
-          adminEmail: bitcoinDetails.adminEmail
+          adminEmail: bankDetails.adminEmail
         }
       });
     }
