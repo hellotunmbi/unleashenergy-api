@@ -2,6 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const errorHandler = require("./middlewares/error");
+const colors = require("colors");
 
 require("dotenv").config({ path: "variables.env" });
 require("./handlers/passport");
@@ -13,11 +15,16 @@ app.use(cors());
 
 // Connect to MongoDB...
 let mongoDB = process.env.MONGODB_URL; // || dev_db_url;
-mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(mongoDB, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false
+});
 mongoose.Promise = global.Promise;
 mongoose.connection.on(
   "error",
-  console.error.bind(console, "MongoDB Connection Error...")
+  console.error.bind(console, "MongoDB Connection Error...".red)
 );
 
 // Configure routes...
@@ -37,8 +44,10 @@ app.use("/api/settings", settings);
 app.use("/api/verify", verify);
 app.use("/api/scheduler", scheduler);
 
+app.use(errorHandler);
+
 let port = 1000;
 
 app.listen(process.env.PORT || port, () => {
-  console.log(`Server now up and running on port ${port}`);
+  console.log(`Server now up and running on port ${port}`.yellow.bold);
 });

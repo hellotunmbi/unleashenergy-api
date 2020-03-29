@@ -2,37 +2,34 @@ const jwt = require("jsonwebtoken");
 const Settings = require("../models/Settings");
 const History = require("../models/History");
 const Investment = require("../models/Investment");
+const asyncHandler = require("../middlewares/async.middleware");
+const ErrorResponse = require("../utils/errorResponse");
+
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 //Get User Transaction...
-exports.history = (req, res) => {
+exports.history = asyncHandler(async (req, res, next) => {
   const { userid, email } = req;
+  const history = await History.find({ userid });
 
-  History.find({ userid }, function(err, history) {
-    if (err) {
-      res.json({
-        status: 400,
-        data: { message: "Unable to retrieve transaction history" }
-      });
-    }
-
-    if (history.length === 0) {
-      res.json({
-        status: 200,
-        data: {
-          message: "No transaction found"
-        }
-      });
-    } else if (history.length > 0) {
-      res.json({
-        status: 200,
-        data: {
-          message: "Transactions Found",
-          transactions: history
-        }
-      });
-    }
-  });
-};
+  if (history.length === 0) {
+    res.json({
+      status: 200,
+      data: {
+        message: "No transaction found"
+      }
+    });
+  } else if (history.length > 0) {
+    res.json({
+      status: 200,
+      data: {
+        message: "Transactions Found",
+        transactions: history
+      }
+    });
+  }
+});
 
 //Save Transaction...
 exports.saveHistory = (req, res) => {
@@ -73,7 +70,7 @@ exports.saveHistory = (req, res) => {
 
 // Save Investment...
 exports.saveInvestment = async (req, res) => {
-  const userid = req.userid;
+  const { userid, email, fullname } = req;
 
   const {
     amtInvested,
@@ -119,7 +116,7 @@ exports.saveInvestment = async (req, res) => {
           email: "support@purpcoininvest.com",
           name: "Purple Coin Investment"
         },
-        subject: "Verify Your Email - PurpCoinInvest",
+        subject: "Activate Your Investement - PurpCoin Invest",
         text: "Activate Your Investement - PurpCoin Invest",
         html: `Dear ${fullname},<br/><br/>
     				We have received your request to invest ${amtInvested} in Purple Coin Investment.<br/><br/>
