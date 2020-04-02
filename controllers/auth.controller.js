@@ -1,181 +1,170 @@
-const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const authCtrl = require("../routes/user.route");
-const sgMail = require("@sendgrid/mail");
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const asyncHandler = require("../middlewares/async.middleware");
 
-const bitcore = require("bitcore-lib");
+// LOGIN...
+exports.login = asyncHandler(async (req, res, next) => {
+  const phone = req.body.phone;
 
-const Address = bitcore.Address;
-const PrivateKey = bitcore.PrivateKey;
-const PublicKey = bitcore.PublicKey;
-const Networks = bitcore.Networks;
+  // Check if phone is sent from API
+  if (!phone) {
+    res.json({
+      status: 400,
+      data: {
+        message: "phone number required"
+      }
+    });
+    return;
+  }
 
-// REGISTER...
-exports.register = async function(req, res) {
-  const { fullname, email } = req.body;
-  const status = "unverified";
+  const user = await User.findOne({ phone: phone });
 
-  // Generate wallet and investment addresses
-  const wallet = await this.generateAddress();
+  console.log("User", user);
 
-  try {
-    const userData = {
-      fullname,
-      email,
-      status,
-      wallet
-    };
+  if (!user) {
+    //Save user to db with generated OTP
+    // Return OTP to response
+    const otp = Math.floor(Math.random() * 9000);
 
-    let user = new User(userData);
+    const savedUser = await User.create({
+      phone: phone,
+      status: "pending",
+      role: "user",
+      authCode: otp
+    });
 
-    user = await User.register(user, req.body.password);
-    const id = user._id;
-    console.log("id", id);
-
-    const token = jwt.sign(
-      {
-        id,
-        fullname,
-        email
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "1w" }
-    );
-
-    const hostURL = "https://purpcoin-api.herokuapp.com/api/verify/";
-
-    //Send verification email...
-    const msg = {
-      to: email,
-      from: {
-        email: "support@purpcoininvest.com",
-        name: "Purple Coin Investment"
-      },
-      subject: "Verify Your Email - PurpCoinInvest",
-      text: "PurpCoin Invest App - Confirm Your Email",
-      html: `Dear ${fullname},<br/><br/>
-    				We have received your request to create an account on PurpCoin Invest App.<br/><br/>
-    				Kindly confirm your email to complete your registration process by clicking the button below:<br/><br/>
-    				<a href="${hostURL}${id}"><button style="padding: 1rem 2rem; font-size: 1rem; background-color: rgba(83, 28, 179, 0.57); color: #FFFFFF; border-radius: 4px">Verify Email</button></a>`
-    };
-    sgMail.send(msg);
+    // TODO: Send OTP as sms and email
 
     res.json({
       status: 200,
       data: {
-        message: "Successfully Registered",
-        token,
-        user
+        message: "User registered",
+        otp
       }
     });
-  } catch (err) {
-    res.json({
-      status: 400,
-      data: {
-        message: "Unable to register. Try again",
-        error: err
-      }
-    });
-  }
-};
+  } else {
+    // Check user status. If 'active', log them in
+    // If not active, send OTP
+    if (user["status"] && user["status"] === "active") {
+      // Log in User
 
-// LOGIN...
-exports.login = (req, res, next) => {
-  passport.authenticate("local", function(err, user, info) {
-    if (err) {
-      return next(err);
-    }
-
-    const { fullname, email, status } = user;
-    const id = user._id;
-    user.hash = "";
-    user.salt = "";
-    user["wallet"].privateKey = "";
-
-    if (!user) {
-      res.json({
-        status: 404,
-        data: {
-          message: "Invalid Login Credentials",
-          err
-        }
-      });
-    } else if (status === "unverified") {
-      res.json({
-        status: 401,
-        data: {
-          message:
-            "Account Not Verified. Check your email for Verification Link"
-        }
-      });
-    } else if (status === "verified") {
       const token = jwt.sign(
         {
-          id,
-          fullname,
-          email
+          id: user._id,
+          phone
         },
         process.env.JWT_SECRET,
-        { expiresIn: "1w" }
+        { expiresIn: "1y" }
       );
 
       res.json({
         status: 200,
         data: {
-          message: "Successfully Logged In",
+          message: "User found. You can login",
           user,
-          token,
-          info
+          token
         }
       });
     } else {
+      // sendOTP(user["_id"]);
+
+      const newOTP = generateOTP();
+
+      const regenOTP = await User.findOneAndUpdate(
+        { phone },
+        { authCode: newOTP }
+      );
       res.json({
-        status: 400,
+        status: 200,
         data: {
-          message: "User cannot be authenticated."
+          message: "User hasnt been activated",
+          otp: newOTP
         }
       });
     }
-  })(req, res, next);
-};
+  }
+});
 
-generateAddress = () => {
-  var privateKey = PrivateKey();
-  var publicKey = PublicKey(privateKey);
-  var addressRaw = Address(publicKey, Networks.livenet);
-  let address = addressRaw.toString();
+exports.verifyOTP = asyncHandler(async (req, res, next) => {
+  const { phone, otp } = req.body;
 
-  // console.log("Private Key", privateKey.bn);
+  if (!phone || !otp) {
+    res.json({
+      status: 400,
+      data: {
+        message: "Phone Number and OTP required"
+      }
+    });
+    return;
+  }
 
-  data = {
-    privateKey: privateKey.bn.toString(),
-    accountNo: address
-  };
+  const verifiedOTP = await User.findOne({ phone, authCode: otp });
 
-  return data;
-};
+  if (verifiedOTP) {
+    res.json({
+      status: 200,
+      data: {
+        message: "Successfully Verified",
+        otp: verifiedOTP.authCode
+      }
+    });
+  } else {
+    res.json({
+      status: 400,
+      data: {
+        message: "Invalid OTP",
+        user: verifiedOTP.authCode
+      }
+    });
+  }
+});
 
-function sendEmail() {
-  const { email, fullname } = req.body;
-  const msg = {
-    to: email,
-    from: {
-      email: "support@purpcoininvest.com",
-      name: "Purple Coin Investment"
+// const token = jwt.sign(
+//   {
+//     id,
+//     fullname,
+//     email
+//   },
+//   process.env.JWT_SECRET,
+//   { expiresIn: "1y" }
+// );
+
+exports.register = asyncHandler(async (req, res, next) => {
+  const { fullname, email, phone } = req.body;
+  if (!fullname || !email) {
+    res.json({
+      status: 400,
+      data: {
+        message: "Full Name and Email Address are required"
+      }
+    });
+  }
+
+  const registered = await User.findOneAndUpdate(
+    { phone },
+    { fullname, email, status: "active" }
+  );
+
+  const token = jwt.sign(
+    {
+      id: registered._id,
+      phone
     },
-    subject: "Verify Your Email - PurpCoinInvest",
-    text: "PurpCoin Invest App - Confirm Your Email",
-    html: `Dear ${fullname},<br/><br/>
-    				We have received your request to create an account on PurpCoin Invest App.<br/><br/>
-    				Kindly confirm your email to complete your registration process by clicking the button below:<br/><br/>
-    				<a href="#"><button style="padding: 1rem 2rem; font-size: 1rem; background-color: rgba(83, 28, 179, 0.57); color: #FFFFFF; border-radius: 4px">Verify Email</button></a>`
-  };
-  sgMail.send(msg);
+    process.env.JWT_SECRET,
+    { expiresIn: "1y" }
+  );
 
   res.json({
     status: 200,
-    message: "Mail sent successfully!!"
+    user: registered,
+    token
   });
-}
+});
+
+generateOTP = () => Math.floor(Math.random() * 9000);
+
+// customErrorHandler = (fields, errorMessage) => {
+//   if(typeof fields == Array) {
+
+//   }
+// }

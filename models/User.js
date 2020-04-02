@@ -8,23 +8,17 @@ mongoose.Promise = global.Promise;
 
 const userSchema = new Schema({
   fullname: {
-    type: String,
-    required: true
+    type: String
   },
   email: {
     type: String,
     trim: true,
-    lowercase: true,
-    required: true,
-    unique: true,
-    validate: [validator.isEmail, "Invalid Email Address"]
+    lowercase: true
   },
-  wallet: {
-    balanceUSD: { type: Number, trim: true, default: 10.0 },
-    balanceBTC: { type: Number, trim: true, default: 0.0 },
-    accountNo: Object,
-    privateKey: Object
+  phone: {
+    type: Number
   },
+  addresses: [{ address: String, city: String, localgovt: String }],
   authCode: {
     type: String,
     trim: true
@@ -33,9 +27,10 @@ const userSchema = new Schema({
   status: {
     type: String,
     trim: true,
-    required: true
+    required: true,
+    enum: ["pending", "active", "inactive"]
   },
-  created_at: Date,
+  created_at: { type: Date },
   updated_at: Date
 });
 
@@ -56,7 +51,7 @@ userSchema.pre("save", function(next) {
 // update middleware
 userSchema.pre("update", function(next) {
   // get the current date
-  var currentDate = new Date();
+  const currentDate = new Date();
 
   // change the updated_at field to current date
   this.updated_at = currentDate;
@@ -67,7 +62,7 @@ userSchema.pre("update", function(next) {
   next();
 });
 
-userSchema.plugin(passportLocalMongoose, { usernameField: "email" });
+userSchema.plugin(passportLocalMongoose, { usernameField: "phone" });
 userSchema.plugin(mongodbErrorHandler);
 
 module.exports = mongoose.model("User", userSchema);

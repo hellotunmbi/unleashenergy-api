@@ -12,9 +12,8 @@ exports.verifyToken = (req, res, next) => {
         err
       });
     // if everything good, save to request for use in other routes
-    req.email = decoded.email;
-    req.userid = decoded.id;
-    req.fullname = decoded.fullname;
+    req.id = decoded.id;
+    req.phone = decoded.phone;
     next();
   });
 };

@@ -8,6 +8,12 @@ router.get("/", (req, res) => {
   res.send("User");
 });
 
+router.post(
+  "/addaddress",
+  authMiddleware.verifyToken,
+  userController.addAddress
+);
+
 //get history of user's transactions
 router.get("/history", authMiddleware.verifyToken, userController.history);
 
@@ -17,16 +23,16 @@ router.post("/history", authMiddleware.verifyToken, userController.saveHistory);
 //ger user's investments...
 
 //save user's investment...
-router.post(
-  "/investment",
-  authMiddleware.verifyToken,
-  userController.saveInvestment
-);
+// router.post(
+//   "/investment",
+//   authMiddleware.verifyToken,
+//   userController.saveInvestment
+// );
 
-router.get(
-  "/investment",
-  authMiddleware.verifyToken,
-  userController.getInvestment
-);
+// router.get(
+//   "/investment",
+//   authMiddleware.verifyToken,
+//   userController.getInvestment
+// );
 
 module.exports = router;

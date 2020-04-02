@@ -9,6 +9,7 @@ router.get("/", (req, res) => {
 });
 
 router.post("/login", authController.login);
+router.post("/verifyotp", authController.verifyOTP);
 router.post("/register", authController.register);
 
 // router.post("/sendemail", authController.sendEmail);
