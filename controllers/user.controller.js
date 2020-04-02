@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const Settings = require("../models/Settings");
 const History = require("../models/History");
 const User = require("../models/User");
-const Investment = require("../models/Investment");
 const asyncHandler = require("../middlewares/async.middleware");
 const ErrorResponse = require("../utils/errorResponse");
 
@@ -75,13 +74,12 @@ exports.addAddress = asyncHandler(async (req, res, next) => {
   const { id, phone } = req;
 
   if (!address || !city || !localgovt || !id || !phone) {
-    res.json({
-      status: 400,
-      data: {
-        message: "Expecting address,city and localgovt but got incomplete data"
-      }
-    });
-    return;
+    return next(
+      new ErrorResponse(
+        "Expecting address,city and localgovt but got incomplete data",
+        400
+      )
+    );
   }
 
   const newAddess = {
@@ -102,3 +100,5 @@ exports.addAddress = asyncHandler(async (req, res, next) => {
     }
   });
 });
+
+exports.createOrder = asyncHandler(async (req, res) => {});

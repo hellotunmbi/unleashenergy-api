@@ -1,38 +1,27 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
 
 const Schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
 
-const orderSchema = new Schema({
-  user_id: {
+const cylinderSchema = new Schema({
+  name: {
     type: Schema.Types.ObjectId,
     required: true
   },
-  address_id: {
-    type: Schema.Types.ObjectId,
-    required: true
+  quantity: { type: String },
+  dimension: {
+    height: String,
+    width: String
   },
-  cylinder_size: { type: String },
-  paid: {
-    type: Boolean
-  },
-  payment_method: {
-    type: String,
-    required: true
-  },
-  status: {
-    type: String,
-    trim: true,
-    required: true,
-    enum: ["pending", "paid", "inactive"]
+  price: {
+    type: Number
   },
   created_at: { type: Date },
   updated_at: Date
 });
 
 // save middleware
-orderSchema.pre("save", function(next) {
+cylinderSchema.pre("save", function(next) {
   // get the current date
   var currentDate = new Date();
 
@@ -46,7 +35,7 @@ orderSchema.pre("save", function(next) {
 });
 
 // update middleware
-orderSchema.pre("update", function(next) {
+cylinderSchema.pre("update", function(next) {
   // get the current date
   const currentDate = new Date();
 
@@ -59,4 +48,4 @@ orderSchema.pre("update", function(next) {
   next();
 });
 
-module.exports = mongoose.model("Cylinders", orderSchema);
+module.exports = mongoose.model("Cylinders", cylinderSchema);

@@ -12,6 +12,6 @@ router.post("/login", authController.login);
 router.post("/verifyotp", authController.verifyOTP);
 router.post("/register", authController.register);
 
-// router.post("/sendemail", authController.sendEmail);
+router.post("/sendemail", authController.sendEmail);
 
 module.exports = router;

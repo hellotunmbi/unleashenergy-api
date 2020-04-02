@@ -1,6 +1,15 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const asyncHandler = require("../middlewares/async.middleware");
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+const Jusibe = require("jusibe");
+
+const jusibe = new Jusibe(
+  process.env.JUSIBE_PUBLIC_KEY,
+  process.env.JUSIBE_ACCESS_TOKEN
+);
 
 // LOGIN...
 exports.login = asyncHandler(async (req, res, next) => {
@@ -34,13 +43,28 @@ exports.login = asyncHandler(async (req, res, next) => {
     });
 
     // TODO: Send OTP as sms and email
+    var payload = {
+      to: phone,
+      from: "Unleash Energy",
+      message: `Your Unleash Energy registration OTP Code is ${otp}`
+    };
+
+    // const smsSent = await jusibe.sendSMS(payload);
+    jusibe
+      .sendSMS(payload)
+      .then(res => console.log("SENT", res.body))
+      .catch(err => console.log("ERROR", err.body));
+
+    // console.log(smsSent.body);
 
     res.json({
       status: 200,
       data: {
         message: "User registered",
-        otp
+        otp,
+        phone
       }
+      // sms: smsSent.body
     });
   } else {
     // Check user status. If 'active', log them in
@@ -168,3 +192,25 @@ generateOTP = () => Math.floor(Math.random() * 9000);
 
 //   }
 // }
+
+exports.sendEmail = (req, res) => {
+  const msg = {
+    to: "hellotunmbi@gmail.com",
+    from: "Unleash Energy <info@unleashenergy.com>",
+    subject: "Test Email with Unleash",
+    text: "intro title header",
+    html: "This is a test email with Unleash Energy"
+  };
+  sgMail
+    .send(msg)
+    .then(sent => {
+      res.json({
+        message: "Email Sent Successfully"
+      });
+    })
+    .catch(err =>
+      res.json({
+        message: "Unable to send message"
+      })
+    );
+};
