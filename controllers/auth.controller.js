@@ -128,16 +128,14 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
     res.json({
       status: 200,
       data: {
-        message: "Successfully Verified",
-        otp: verifiedOTP.authCode
+        message: "Successfully Verified"
       }
     });
   } else {
     res.json({
       status: 400,
       data: {
-        message: "Invalid OTP",
-        user: verifiedOTP.authCode
+        message: "Invalid OTP"
       }
     });
   }
@@ -166,7 +164,8 @@ exports.register = asyncHandler(async (req, res, next) => {
 
   const registered = await User.findOneAndUpdate(
     { phone },
-    { fullname, email, status: "active" }
+    { fullname, email, status: "active" },
+    { new: true }
   );
 
   const token = jwt.sign(

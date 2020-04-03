@@ -41,7 +41,7 @@ const scheduler = require("./routes/scheduler.route");
 
 // ROUTES...
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Purpcoin" });
+  res.status(200).json({ message: "Unleash Energy" });
 });
 app.use("/api/auth", auth);
 app.use("/api/user", user);

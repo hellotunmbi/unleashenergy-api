@@ -16,7 +16,7 @@ const userSchema = new Schema({
     lowercase: true
   },
   phone: {
-    type: Number
+    type: String
   },
   addresses: [{ address: String, city: String, localgovt: String }],
   authCode: {
