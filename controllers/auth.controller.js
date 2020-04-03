@@ -135,16 +135,6 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
   }
 });
 
-// const token = jwt.sign(
-//   {
-//     id,
-//     fullname,
-//     email
-//   },
-//   process.env.JWT_SECRET,
-//   { expiresIn: "1y" }
-// );
-
 exports.register = asyncHandler(async (req, res, next) => {
   const { fullname, email, phone } = req.body;
   if (!fullname || !email) {
@@ -173,8 +163,11 @@ exports.register = asyncHandler(async (req, res, next) => {
 
   res.json({
     status: 200,
-    user: registered,
-    token
+    data: {
+      message: "User successfully registered",
+      user: registered,
+      token
+    }
   });
 });
 
