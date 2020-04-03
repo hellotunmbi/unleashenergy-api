@@ -178,17 +178,17 @@ exports.register = asyncHandler(async (req, res, next) => {
 
 generateOTP = () => Math.floor(Math.random() * 9000);
 
-sendOTPSMS = (phone, otp) => {
+sendOTPSMS = async (phone, otp) => {
   // Send OTP as SMS...
-    var payload = {
-      to: phone,
-      from: "Unleash Energy",
-      message: `Your Unleash Energy registration OTP Code is ${otp}`
-    };
+  var payload = {
+    to: phone,
+    from: "Unleash Energy",
+    message: `Your Unleash Energy registration OTP Code is ${otp}`
+  };
 
-    const smsSent = await jusibe.sendSMS(payload);
-    console.log(`SMS SENT TO: ${phone}`, smsSent.body);
-}
+  const smsSent = await jusibe.sendSMS(payload);
+  console.log(`SMS SENT TO: ${phone}`, smsSent.body);
+};
 
 // customErrorHandler = (fields, errorMessage) => {
 //   if(typeof fields == Array) {
