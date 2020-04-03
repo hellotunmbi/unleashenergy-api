@@ -42,7 +42,7 @@ exports.login = asyncHandler(async (req, res, next) => {
       authCode: otp
     });
 
-    this.sendOTPSMS(phone, otp);
+    sendOTPSMS(phone, otp);
 
     res.json({
       status: 200,
@@ -87,7 +87,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 
       const newOTP = generateOTP();
 
-      this.sendOTPSMS(phone, newOTP);
+      sendOTPSMS(phone, newOTP);
 
       const regenOTP = await User.findOneAndUpdate(
         { phone },
