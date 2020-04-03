@@ -31,10 +31,10 @@ exports.login = asyncHandler(async (req, res, next) => {
   console.log("User", user);
 
   if (!user) {
-    //Save user to db with generated OTP
-    // Return OTP to response
+    // Generate OTP...
     const otp = Math.floor(Math.random() * 9000);
 
+    // Save to DB...
     const savedUser = await User.create({
       phone: phone,
       status: "pending",
@@ -42,26 +42,20 @@ exports.login = asyncHandler(async (req, res, next) => {
       authCode: otp
     });
 
-    // TODO: Send OTP as sms and email
+    // Send OTP as SMS...
     var payload = {
       to: phone,
       from: "Unleash Energy",
       message: `Your Unleash Energy registration OTP Code is ${otp}`
     };
 
-    // const smsSent = await jusibe.sendSMS(payload);
-    jusibe
-      .sendSMS(payload)
-      .then(res => console.log("SENT", res.body))
-      .catch(err => console.log("ERROR", err.body));
-
-    // console.log(smsSent.body);
+    const smsSent = await jusibe.sendSMS(payload);
+    console.log(smsSent.body);
 
     res.json({
       status: 200,
       data: {
         message: "User registered",
-        otp,
         phone
       }
       // sms: smsSent.body
@@ -71,7 +65,6 @@ exports.login = asyncHandler(async (req, res, next) => {
     // If not active, send OTP
     if (user["status"] && user["status"] === "active") {
       // Log in User
-
       const token = jwt.sign(
         {
           id: user._id,
@@ -102,13 +95,14 @@ exports.login = asyncHandler(async (req, res, next) => {
         status: 200,
         data: {
           message: "User hasnt been activated",
-          otp: newOTP
+          phone
         }
       });
     }
   }
 });
 
+// Verify OTP...
 exports.verifyOTP = asyncHandler(async (req, res, next) => {
   const { phone, otp } = req.body;
 
