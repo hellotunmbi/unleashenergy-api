@@ -194,6 +194,7 @@ generateOTP = () => Math.floor(Math.random() * 9000);
 // }
 
 exports.sendEmail = (req, res) => {
+  const recipient = req.body.recipient;
   const msg = {
     to: "hellotunmbi@gmail.com",
     from: "Unleash Energy <info@unleashenergy.com>",
