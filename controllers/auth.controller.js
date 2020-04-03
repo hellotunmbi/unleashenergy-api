@@ -42,15 +42,7 @@ exports.login = asyncHandler(async (req, res, next) => {
       authCode: otp
     });
 
-    // Send OTP as SMS...
-    var payload = {
-      to: phone,
-      from: "Unleash Energy",
-      message: `Your Unleash Energy registration OTP Code is ${otp}`
-    };
-
-    const smsSent = await jusibe.sendSMS(payload);
-    console.log(smsSent.body);
+    this.sendOTPSMS(phone, otp);
 
     res.json({
       status: 200,
@@ -82,10 +74,20 @@ exports.login = asyncHandler(async (req, res, next) => {
           token
         }
       });
+    } else if (user["status"] && user["status"] === "incomplete") {
+      res.json({
+        status: 200,
+        data: {
+          message: "User found but did not complete registration",
+          status: user["status"]
+        }
+      });
     } else {
       // sendOTP(user["_id"]);
 
       const newOTP = generateOTP();
+
+      this.sendOTPSMS(phone, newOTP);
 
       const regenOTP = await User.findOneAndUpdate(
         { phone },
@@ -116,7 +118,10 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
     return;
   }
 
-  const verifiedOTP = await User.findOne({ phone, authCode: otp });
+  const verifiedOTP = await User.findOneAndUpdate(
+    { phone, authCode: otp },
+    { status: "incomplete" }
+  );
 
   if (verifiedOTP) {
     res.json({
@@ -172,6 +177,18 @@ exports.register = asyncHandler(async (req, res, next) => {
 });
 
 generateOTP = () => Math.floor(Math.random() * 9000);
+
+sendOTPSMS = (phone, otp) => {
+  // Send OTP as SMS...
+    var payload = {
+      to: phone,
+      from: "Unleash Energy",
+      message: `Your Unleash Energy registration OTP Code is ${otp}`
+    };
+
+    const smsSent = await jusibe.sendSMS(payload);
+    console.log(`SMS SENT TO: ${phone}`, smsSent.body);
+}
 
 // customErrorHandler = (fields, errorMessage) => {
 //   if(typeof fields == Array) {

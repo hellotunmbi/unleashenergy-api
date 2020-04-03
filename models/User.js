@@ -29,7 +29,7 @@ const userSchema = new Schema({
     type: String,
     trim: true,
     required: true,
-    enum: ["pending", "active", "inactive"]
+    enum: ["pending", "incomplete", "active", "inactive"]
   },
   created_at: { type: Date },
   updated_at: Date
