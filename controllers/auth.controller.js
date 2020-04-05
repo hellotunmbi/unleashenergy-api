@@ -55,52 +55,52 @@ exports.login = asyncHandler(async (req, res, next) => {
   } else {
     // Check user status. If 'active', log them in
     // If not active, send OTP
-    if (user["status"] && user["status"] === "active") {
-      // Log in User
-      const token = jwt.sign(
-        {
-          id: user._id,
-          phone
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "1y" }
-      );
+    // if (user["status"] && user["status"] === "active") {
+    //   // Log in User
+    //   const token = jwt.sign(
+    //     {
+    //       id: user._id,
+    //       phone
+    //     },
+    //     process.env.JWT_SECRET,
+    //     { expiresIn: "1y" }
+    //   );
 
-      res.json({
-        status: 200,
-        data: {
-          message: "User found. You can login",
-          user,
-          token
-        }
-      });
-    } else if (user["status"] && user["status"] === "incomplete") {
-      res.json({
-        status: 200,
-        data: {
-          message: "User found but did not complete registration",
-          status: user["status"]
-        }
-      });
-    } else {
-      // sendOTP(user["_id"]);
+    //   res.json({
+    //     status: 200,
+    //     data: {
+    //       message: "User found. You can login",
+    //       user,
+    //       token
+    //     }
+    //   });
+    // } else if (user["status"] && user["status"] === "incomplete") {
+    //   res.json({
+    //     status: 200,
+    //     data: {
+    //       message: "User found but did not complete registration",
+    //       status: user["status"]
+    //     }
+    //   });
+    // } else {
+    // sendOTP(user["_id"]);
 
-      const newOTP = generateOTP();
+    const newOTP = generateOTP();
 
-      sendOTPSMS(phone, newOTP);
+    sendOTPSMS(phone, newOTP);
 
-      const regenOTP = await User.findOneAndUpdate(
-        { phone },
-        { authCode: newOTP }
-      );
-      res.json({
-        status: 200,
-        data: {
-          message: "User hasnt been activated",
-          phone
-        }
-      });
-    }
+    const regenOTP = await User.findOneAndUpdate(
+      { phone },
+      { authCode: newOTP }
+    );
+    res.json({
+      status: 200,
+      data: {
+        message: "User hasnt been activated",
+        phone
+      }
+    });
+    // }
   }
 });
 
@@ -118,25 +118,58 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
     return;
   }
 
-  const verifiedOTP = await User.findOneAndUpdate(
-    { phone, authCode: otp },
-    { status: "incomplete" }
-  );
+  // const verifiedOTP = await User.findOneAndUpdate(
+  //   { phone, authCode: otp },
+  //   { status: "incomplete" }
+  // );
 
-  if (verifiedOTP) {
-    res.json({
-      status: 200,
-      data: {
-        message: "Successfully Verified"
-      }
-    });
-  } else {
+  // Check with your phone and otp
+  // if found and status is not active, return message and status
+  // If found and status is active, return message and user data
+  const verifiedOTP = await User.findOne({ phone, authCode: otp });
+
+  if (!verifiedOTP) {
     res.json({
       status: 400,
       data: {
         message: "Invalid OTP"
       }
     });
+  } else {
+    if (verifiedOTP["status"] && verifiedOTP["status"] != "active") {
+      res.json({
+        status: 200,
+        data: {
+          message: "OTP Verified but user not active yet",
+          status: verifiedOTP["status"]
+        }
+      });
+      return;
+    } else if (verifiedOTP["status"] && user["status"] === "active") {
+      const token = jwt.sign(
+        {
+          id: user._id,
+          phone
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "1y" }
+      );
+      res.json({
+        status: 200,
+        data: {
+          message: "User found. You can login",
+          user,
+          token
+        }
+      });
+    } else {
+      res.json({
+        status: 400,
+        data: {
+          message: "Unable to verify OTP"
+        }
+      });
+    }
   }
 });
 
