@@ -145,7 +145,7 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
         }
       });
       return;
-    } else if (verifiedOTP["status"] && user["status"] === "active") {
+    } else if (verifiedOTP["status"] && verifiedOTP["status"] === "active") {
       const token = jwt.sign(
         {
           id: user._id,
@@ -158,7 +158,7 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
         status: 200,
         data: {
           message: "User found. You can login",
-          user,
+          user: verifiedOTP,
           token
         }
       });
