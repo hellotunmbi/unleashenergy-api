@@ -148,7 +148,7 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
     } else if (verifiedOTP["status"] && verifiedOTP["status"] === "active") {
       const token = jwt.sign(
         {
-          id: user._id,
+          id: verifiedOTP._id,
           phone
         },
         process.env.JWT_SECRET,
@@ -216,7 +216,7 @@ sendOTPSMS = async (phone, otp) => {
   var payload = {
     to: phone,
     from: "Unleash Energy",
-    message: `Your Unleash Energy registration OTP Code is ${otp}`
+    message: `Unleash Energy OTP Code is ${otp}`
   };
 
   const smsSent = await jusibe.sendSMS(payload);
