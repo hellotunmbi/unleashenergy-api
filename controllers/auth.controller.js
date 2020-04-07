@@ -6,12 +6,16 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const Jusibe = require("jusibe");
 
+// ---------------------------------------------------------
+
 const jusibe = new Jusibe(
   process.env.JUSIBE_PUBLIC_KEY,
   process.env.JUSIBE_ACCESS_TOKEN
 );
 
-// LOGIN...
+// ---------------------------------------------------------
+// LOGIN USER...
+
 exports.login = asyncHandler(async (req, res, next) => {
   const phone = req.body.phone;
 
@@ -53,38 +57,6 @@ exports.login = asyncHandler(async (req, res, next) => {
       // sms: smsSent.body
     });
   } else {
-    // Check user status. If 'active', log them in
-    // If not active, send OTP
-    // if (user["status"] && user["status"] === "active") {
-    //   // Log in User
-    //   const token = jwt.sign(
-    //     {
-    //       id: user._id,
-    //       phone
-    //     },
-    //     process.env.JWT_SECRET,
-    //     { expiresIn: "1y" }
-    //   );
-
-    //   res.json({
-    //     status: 200,
-    //     data: {
-    //       message: "User found. You can login",
-    //       user,
-    //       token
-    //     }
-    //   });
-    // } else if (user["status"] && user["status"] === "incomplete") {
-    //   res.json({
-    //     status: 200,
-    //     data: {
-    //       message: "User found but did not complete registration",
-    //       status: user["status"]
-    //     }
-    //   });
-    // } else {
-    // sendOTP(user["_id"]);
-
     const newOTP = generateOTP();
 
     sendOTPSMS(phone, newOTP);
@@ -104,7 +76,9 @@ exports.login = asyncHandler(async (req, res, next) => {
   }
 });
 
+// ---------------------------------------------------------
 // Verify OTP...
+
 exports.verifyOTP = asyncHandler(async (req, res, next) => {
   const { phone, otp } = req.body;
 
@@ -117,11 +91,6 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
     });
     return;
   }
-
-  // const verifiedOTP = await User.findOneAndUpdate(
-  //   { phone, authCode: otp },
-  //   { status: "incomplete" }
-  // );
 
   // Check with your phone and otp
   // if found and status is not active, return message and status
@@ -173,6 +142,9 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
   }
 });
 
+// ---------------------------------------------------------
+// Register User...
+
 exports.register = asyncHandler(async (req, res, next) => {
   const { fullname, email, phone } = req.body;
   if (!fullname || !email) {
@@ -209,8 +181,13 @@ exports.register = asyncHandler(async (req, res, next) => {
   });
 });
 
+// ---------------------------------------------------------
+// Generate OTP...
+
 generateOTP = () => Math.floor(Math.random() * 9000);
 
+// ---------------------------------------------------------
+// Send OTP SMS...
 sendOTPSMS = async (phone, otp) => {
   // Send OTP as SMS...
   var payload = {
@@ -228,6 +205,9 @@ sendOTPSMS = async (phone, otp) => {
 
 //   }
 // }
+
+// ---------------------------------------------------------
+// Send Email Address...
 
 exports.sendEmail = (req, res) => {
   const recipient = req.body.recipient;
@@ -251,3 +231,5 @@ exports.sendEmail = (req, res) => {
       })
     );
 };
+
+// ---------------------------------------------------------

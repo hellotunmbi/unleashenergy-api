@@ -20,6 +20,12 @@ router.get(
   userController.getUserAddress
 );
 
+router.post(
+  "/requestservice",
+  authMiddleware.verifyToken,
+  userController.requestService
+);
+
 //get history of user's transactions
 router.get("/history", authMiddleware.verifyToken, userController.history);
 

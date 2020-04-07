@@ -1,14 +1,16 @@
 const jwt = require("jsonwebtoken");
-const Settings = require("../models/Settings");
 const History = require("../models/History");
 const User = require("../models/User");
+const Services = require("../models/Services");
 const asyncHandler = require("../middlewares/async.middleware");
 const ErrorResponse = require("../utils/errorResponse");
 
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+// ---------------------------------------------------------
 //Get User Transaction...
+
 exports.history = asyncHandler(async (req, res, next) => {
   const { userid, email } = req;
   const history = await History.find({ userid });
@@ -31,7 +33,9 @@ exports.history = asyncHandler(async (req, res, next) => {
   }
 });
 
+// ---------------------------------------------------------
 //Save Transaction...
+
 exports.saveHistory = (req, res) => {
   const { userid, email } = req;
   const { description, amountUSD, transactionDate } = req.body;
@@ -68,7 +72,9 @@ exports.saveHistory = (req, res) => {
   });
 };
 
-// Add Address
+// ---------------------------------------------------------
+// Add Address...
+
 exports.addAddress = asyncHandler(async (req, res, next) => {
   const { address, city, localgovt } = req.body;
   const { id, phone } = req;
@@ -101,6 +107,9 @@ exports.addAddress = asyncHandler(async (req, res, next) => {
   });
 });
 
+// ---------------------------------------------------------
+// Get User Address...
+
 exports.getUserAddress = asyncHandler(async (req, res, next) => {
   const id = req.id;
 
@@ -124,4 +133,43 @@ exports.getUserAddress = asyncHandler(async (req, res, next) => {
   }
 });
 
+// ---------------------------------------------------------
+// Create New Order...
+
 exports.createOrder = asyncHandler(async (req, res) => {});
+
+// ---------------------------------------------------------
+
+// Service Request...
+exports.requestService = asyncHandler(async (req, res) => {
+  const { fullname, category, description, status } = req.body;
+  const id = req.id;
+
+  if (!id || !fullname || !category || !description) {
+    res.json({
+      status: 400,
+      data: {
+        message: "Parameters not set or complete"
+      }
+    });
+    return;
+  }
+
+  const service = {
+    userid: id,
+    fullname,
+    category,
+    description,
+    status
+  };
+
+  const serviceAdded = await Services.create(service);
+
+  res.json({
+    status: 200,
+    data: {
+      message: "Service Requested Successfully",
+      services: serviceAdded
+    }
+  });
+});
