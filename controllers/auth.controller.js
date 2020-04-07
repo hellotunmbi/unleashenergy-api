@@ -96,7 +96,7 @@ exports.login = asyncHandler(async (req, res, next) => {
     res.json({
       status: 200,
       data: {
-        message: "User hasnt been activated",
+        message: "User found but needs to login",
         phone
       }
     });

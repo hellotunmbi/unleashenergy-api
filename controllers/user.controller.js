@@ -101,4 +101,27 @@ exports.addAddress = asyncHandler(async (req, res, next) => {
   });
 });
 
+exports.getUserAddress = asyncHandler(async (req, res, next) => {
+  const id = req.id;
+
+  const userAddress = await User.findById(id).select("addresses");
+
+  if (userAddress && userAddress["addresses"].length > 0) {
+    res.json({
+      status: 200,
+      data: {
+        message: "Addresses successfully found!",
+        addresses: userAddress.addresses
+      }
+    });
+  } else {
+    res.json({
+      status: 200,
+      data: {
+        message: "No address found"
+      }
+    });
+  }
+});
+
 exports.createOrder = asyncHandler(async (req, res) => {});

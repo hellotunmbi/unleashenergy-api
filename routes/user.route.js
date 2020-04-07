@@ -14,6 +14,12 @@ router.post(
   userController.addAddress
 );
 
+router.get(
+  "/address",
+  authMiddleware.verifyToken,
+  userController.getUserAddress
+);
+
 //get history of user's transactions
 router.get("/history", authMiddleware.verifyToken, userController.history);
 
