@@ -142,10 +142,10 @@ exports.createOrder = asyncHandler(async (req, res) => {});
 
 // Service Request...
 exports.requestService = asyncHandler(async (req, res) => {
-  const { fullname, category, description, status } = req.body;
+  const { category, description, status } = req.body;
   const id = req.id;
 
-  if (!id || !fullname || !category || !description) {
+  if (!id || !category || !description || !status) {
     res.json({
       status: 400,
       data: {
@@ -157,7 +157,6 @@ exports.requestService = asyncHandler(async (req, res) => {
 
   const service = {
     userid: id,
-    fullname,
     category,
     description,
     status
