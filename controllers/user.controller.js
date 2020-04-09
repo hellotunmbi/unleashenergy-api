@@ -142,7 +142,7 @@ exports.orderGasRefill = asyncHandler(async (req, res) => {
   const { address_id, cylinder_id, payment_method, status } = req.body;
   const paid = false;
 
-  if (!cylinder_id || !payment_method || !status || !id) {
+  if (!address_id || !cylinder_id || !payment_method || !status || !user_id) {
     res.json({
       status: 400,
       data: {
