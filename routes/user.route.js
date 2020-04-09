@@ -26,6 +26,12 @@ router.post(
   userController.requestService
 );
 
+router.post(
+  "/gasrefill",
+  authMiddleware.verifyToken,
+  userController.orderGasRefill
+);
+
 //get history of user's transactions
 router.get("/history", authMiddleware.verifyToken, userController.history);
 

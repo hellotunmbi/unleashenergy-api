@@ -59,4 +59,4 @@ orderSchema.pre("update", function(next) {
   next();
 });
 
-module.exports = mongoose.model("Cylinders", orderSchema);
+module.exports = mongoose.model("Orders", orderSchema);

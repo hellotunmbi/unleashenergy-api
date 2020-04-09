@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const History = require("../models/History");
 const User = require("../models/User");
+const Order = require("../models/Order");
 const Services = require("../models/Services");
 const asyncHandler = require("../middlewares/async.middleware");
 const ErrorResponse = require("../utils/errorResponse");
@@ -136,7 +137,47 @@ exports.getUserAddress = asyncHandler(async (req, res, next) => {
 // ---------------------------------------------------------
 // Create New Order...
 
-exports.createOrder = asyncHandler(async (req, res) => {});
+exports.orderGasRefill = asyncHandler(async (req, res) => {
+  const id = req.id;
+  const { address_id, cylinder_size, payment_method, status } = req.body;
+  const paid = false;
+
+  if (!cylinder_size || !payment_method || !status || !id) {
+    res.json({
+      status: 400,
+      data: {
+        message: "Incomplete parameters"
+      }
+    });
+    return;
+  }
+
+  const gasRequested = await Order.create({
+    user_id: id,
+    address_id,
+    cylinder_size,
+    payment_method,
+    status,
+    paid
+  });
+
+  if (gasRequested) {
+    res.json({
+      status: 200,
+      data: {
+        message: "Gas Refill Requested Successfully",
+        gasrefill: gasRequested
+      }
+    });
+  } else {
+    res.json({
+      status: 400,
+      data: {
+        message: "Unable to submit gas refill request"
+      }
+    });
+  }
+});
 
 // ---------------------------------------------------------
 

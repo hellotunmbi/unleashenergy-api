@@ -5,9 +5,10 @@ mongoose.Promise = global.Promise;
 
 const cylinderSchema = new Schema({
   name: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true
   },
+  imageURL: String,
   quantity: { type: String },
   dimension: {
     height: String,
@@ -48,4 +49,4 @@ cylinderSchema.pre("update", function(next) {
   next();
 });
 
-module.exports = mongoose.model("Cylinders", cylinderSchema);
+module.exports = mongoose.model("Cylinder", cylinderSchema);
