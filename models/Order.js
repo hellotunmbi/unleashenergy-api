@@ -13,7 +13,7 @@ const orderSchema = new Schema({
     type: Schema.Types.ObjectId,
     required: true
   },
-  cylinder_size: { type: String },
+  cylinder_id: { type: Schema.Types.ObjectId },
   paid: {
     type: Boolean
   },

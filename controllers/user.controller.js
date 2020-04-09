@@ -138,11 +138,11 @@ exports.getUserAddress = asyncHandler(async (req, res, next) => {
 // Create New Order...
 
 exports.orderGasRefill = asyncHandler(async (req, res) => {
-  const id = req.id;
-  const { address_id, cylinder_size, payment_method, status } = req.body;
+  const user_id = req.id;
+  const { address_id, cylinder_id, payment_method, status } = req.body;
   const paid = false;
 
-  if (!cylinder_size || !payment_method || !status || !id) {
+  if (!cylinder_id || !payment_method || !status || !id) {
     res.json({
       status: 400,
       data: {
@@ -153,9 +153,9 @@ exports.orderGasRefill = asyncHandler(async (req, res) => {
   }
 
   const gasRequested = await Order.create({
-    user_id: id,
+    user_id,
     address_id,
-    cylinder_size,
+    cylinder_id,
     payment_method,
     status,
     paid
