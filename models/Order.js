@@ -7,32 +7,35 @@ mongoose.Promise = global.Promise;
 const orderSchema = new Schema({
   user_id: {
     type: Schema.Types.ObjectId,
-    required: true
+    required: true,
   },
   address_id: {
     type: Schema.Types.ObjectId,
-    required: true
+    required: true,
   },
   cylinder_id: { type: Schema.Types.ObjectId },
   paid: {
-    type: Boolean
+    type: Boolean,
   },
   payment_method: {
     type: String,
-    required: true
+    required: true,
   },
   status: {
     type: String,
     trim: true,
     required: true,
-    enum: ["pending", "paid", "inactive"]
+    enum: ["pending", "paid", "inactive"],
   },
+  reference: String,
+  transaction: String,
+  trxref: String,
   created_at: { type: Date },
-  updated_at: Date
+  updated_at: Date,
 });
 
 // save middleware
-orderSchema.pre("save", function(next) {
+orderSchema.pre("save", function (next) {
   // get the current date
   var currentDate = new Date();
 
@@ -46,7 +49,7 @@ orderSchema.pre("save", function(next) {
 });
 
 // update middleware
-orderSchema.pre("update", function(next) {
+orderSchema.pre("update", function (next) {
   // get the current date
   const currentDate = new Date();
 

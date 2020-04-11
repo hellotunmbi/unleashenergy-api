@@ -20,16 +20,16 @@ exports.history = asyncHandler(async (req, res, next) => {
     res.json({
       status: 200,
       data: {
-        message: "No transaction found"
-      }
+        message: "No transaction found",
+      },
     });
   } else if (history.length > 0) {
     res.json({
       status: 200,
       data: {
         message: "Transactions Found",
-        transactions: history
-      }
+        transactions: history,
+      },
     });
   }
 });
@@ -53,21 +53,21 @@ exports.saveHistory = (req, res) => {
     email,
     description,
     amountUSD,
-    transactionDate
+    transactionDate,
   });
 
-  history.save(function(err) {
+  history.save(function (err) {
     if (err) {
       res.json({
         status: 400,
-        data: { message: "Unable to save transaction", error: err }
+        data: { message: "Unable to save transaction", error: err },
       });
     } else {
       res.json({
         status: 200,
         data: {
-          message: "Transaction Successfully Saved"
-        }
+          message: "Transaction Successfully Saved",
+        },
       });
     }
   });
@@ -92,7 +92,7 @@ exports.addAddress = asyncHandler(async (req, res, next) => {
   const newAddess = {
     address,
     city,
-    localgovt
+    localgovt,
   };
 
   const addressAdded = await User.findOneAndUpdate(
@@ -103,8 +103,8 @@ exports.addAddress = asyncHandler(async (req, res, next) => {
   res.json({
     status: 200,
     data: {
-      message: "Address added successfully"
-    }
+      message: "Address added successfully",
+    },
   });
 });
 
@@ -121,15 +121,15 @@ exports.getUserAddress = asyncHandler(async (req, res, next) => {
       status: 200,
       data: {
         message: "Addresses successfully found!",
-        addresses: userAddress.addresses
-      }
+        addresses: userAddress.addresses,
+      },
     });
   } else {
     res.json({
       status: 200,
       data: {
-        message: "No address found"
-      }
+        message: "No address found",
+      },
     });
   }
 });
@@ -146,35 +146,28 @@ exports.orderGasRefill = asyncHandler(async (req, res) => {
     res.json({
       status: 400,
       data: {
-        message: "Incomplete parameters"
-      }
+        message: "Incomplete parameters",
+      },
     });
     return;
   }
 
-  const gasRequested = await Order.create({
-    user_id,
-    address_id,
-    cylinder_id,
-    payment_method,
-    status,
-    paid
-  });
+  const gasRequested = await Order.create(this.body);
 
   if (gasRequested) {
     res.json({
       status: 200,
       data: {
         message: "Gas Refill Requested Successfully",
-        gasrefill: gasRequested
-      }
+        gasrefill: gasRequested,
+      },
     });
   } else {
     res.json({
       status: 400,
       data: {
-        message: "Unable to submit gas refill request"
-      }
+        message: "Unable to submit gas refill request",
+      },
     });
   }
 });
@@ -190,8 +183,8 @@ exports.requestService = asyncHandler(async (req, res) => {
     res.json({
       status: 400,
       data: {
-        message: "Parameters not set or complete"
-      }
+        message: "Parameters not set or complete",
+      },
     });
     return;
   }
@@ -200,7 +193,7 @@ exports.requestService = asyncHandler(async (req, res) => {
     userid: id,
     category,
     description,
-    status
+    status,
   };
 
   const serviceAdded = await Services.create(service);
@@ -209,7 +202,7 @@ exports.requestService = asyncHandler(async (req, res) => {
     status: 200,
     data: {
       message: "Service Requested Successfully",
-      services: serviceAdded
-    }
+      services: serviceAdded,
+    },
   });
 });
