@@ -9,6 +9,7 @@ const orderSchema = new Schema({
     type: Schema.Types.ObjectId,
     required: true,
   },
+  order_id: { type: String, required: true },
   address_id: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -25,7 +26,7 @@ const orderSchema = new Schema({
     type: String,
     trim: true,
     required: true,
-    enum: ["pending", "paid", "inactive"],
+    enum: ["pending", "paid", "failed", "inactive"],
   },
   reference: String,
   transaction: String,

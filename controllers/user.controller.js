@@ -140,7 +140,6 @@ exports.getUserAddress = asyncHandler(async (req, res, next) => {
 exports.orderGasRefill = asyncHandler(async (req, res) => {
   const user_id = req.id;
   const { address_id, cylinder_id, payment_method, status } = req.body;
-  const paid = false;
 
   if (!address_id || !cylinder_id || !payment_method || !status || !user_id) {
     res.json({
@@ -152,7 +151,7 @@ exports.orderGasRefill = asyncHandler(async (req, res) => {
     return;
   }
 
-  const gasRequested = await Order.create(this.body);
+  const gasRequested = await Order.create(Object.assign(req.body, { user_id }));
 
   if (gasRequested) {
     res.json({
@@ -166,7 +165,7 @@ exports.orderGasRefill = asyncHandler(async (req, res) => {
     res.json({
       status: 400,
       data: {
-        message: "Unable to submit gas refill request",
+        message: "Error in submitting gas refill request",
       },
     });
   }
