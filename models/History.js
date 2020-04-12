@@ -18,6 +18,7 @@ const historySchema = new Schema({
     required: true,
   },
   transactionDate: { type: Date, required: true, default: Date.now },
+  status: String,
   created_at: Date,
   updated_at: Date,
 });

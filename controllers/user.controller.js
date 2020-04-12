@@ -41,7 +41,7 @@ exports.history = asyncHandler(async (req, res, next) => {
 
 exports.saveHistory = (req, res) => {
   const { id, phone } = req;
-  const { description, amount, transactionDate } = req.body;
+  const { description, amount, transactionDate, status } = req.body;
 
   // res.json({
   //   status: 200,
@@ -56,6 +56,7 @@ exports.saveHistory = (req, res) => {
     description,
     amount,
     transactionDate,
+    status,
   });
 
   history.save(function (err) {
@@ -178,8 +179,8 @@ exports.orderGasRefill = asyncHandler(async (req, res) => {
 });
 
 // ---------------------------------------------------------
-
 // Service Request...
+
 exports.requestService = asyncHandler(async (req, res) => {
   const { category, description, status } = req.body;
   const id = req.id;
@@ -210,4 +211,45 @@ exports.requestService = asyncHandler(async (req, res) => {
       services: serviceAdded,
     },
   });
+});
+
+// ---------------------------------------------------------
+// Get User Profile...
+
+exports.updateUserProfile = asyncHandler(async (req, res, next) => {
+  const id = req.id;
+  const { fullname, email } = req.body;
+
+  if (!fullname || !email) {
+    res.json({
+      status: 400,
+      data: {
+        message: "Incomplete body params",
+      },
+    });
+    return;
+  }
+
+  const userData = await User.findByIdAndUpdate(
+    id,
+    { fullname, email },
+    { new: true }
+  ).select("fullname email");
+
+  if (userData) {
+    res.json({
+      status: 200,
+      data: {
+        message: "User Information Updated Successfully!",
+        user: userData,
+      },
+    });
+  } else {
+    res.json({
+      status: 200,
+      data: {
+        message: "Unable to update user info",
+      },
+    });
+  }
 });

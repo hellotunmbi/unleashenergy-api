@@ -34,23 +34,13 @@ router.post(
 
 //get history of user's transactions
 router.get("/history", authMiddleware.verifyToken, userController.history);
-
 //save to history
 router.post("/history", authMiddleware.verifyToken, userController.saveHistory);
 
-//ger user's investments...
-
-//save user's investment...
-// router.post(
-//   "/investment",
-//   authMiddleware.verifyToken,
-//   userController.saveInvestment
-// );
-
-// router.get(
-//   "/investment",
-//   authMiddleware.verifyToken,
-//   userController.getInvestment
-// );
+router.put(
+  "/profile",
+  authMiddleware.verifyToken,
+  userController.updateUserProfile
+);
 
 module.exports = router;
