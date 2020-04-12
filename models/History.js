@@ -7,25 +7,23 @@ mongoose.Promise = global.Promise;
 
 const historySchema = new Schema({
   userid: { type: String, required: true, trim: true },
-  email: {
+  phone: {
     type: String,
     trim: true,
-    lowercase: true,
     required: true,
-    validate: [validator.isEmail, "Invalid Email Address"]
   },
   description: { type: String, required: true },
-  amountUSD: {
+  amount: {
     type: Number,
-    required: true
+    required: true,
   },
   transactionDate: { type: Date, required: true, default: Date.now },
   created_at: Date,
-  updated_at: Date
+  updated_at: Date,
 });
 
 // save middleware
-historySchema.pre("save", function(next) {
+historySchema.pre("save", function (next) {
   // get the current date
   var currentDate = new Date();
 
@@ -39,7 +37,7 @@ historySchema.pre("save", function(next) {
 });
 
 // update middleware
-historySchema.pre("update", function(next) {
+historySchema.pre("update", function (next) {
   // get the current date
   var currentDate = new Date();
 

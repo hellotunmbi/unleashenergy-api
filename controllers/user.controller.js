@@ -13,8 +13,8 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 //Get User Transaction...
 
 exports.history = asyncHandler(async (req, res, next) => {
-  const { userid, email } = req;
-  const history = await History.find({ userid });
+  const { id, phone } = req;
+  const history = await History.find({ userid: id, phone });
 
   if (history.length === 0) {
     res.json({
@@ -38,8 +38,8 @@ exports.history = asyncHandler(async (req, res, next) => {
 //Save Transaction...
 
 exports.saveHistory = (req, res) => {
-  const { userid, email } = req;
-  const { description, amountUSD, transactionDate } = req.body;
+  const { id, phone } = req;
+  const { description, amount, transactionDate } = req.body;
 
   // res.json({
   //   status: 200,
@@ -49,10 +49,10 @@ exports.saveHistory = (req, res) => {
   // return;
 
   let history = new History({
-    userid,
-    email,
+    userid: id,
+    phone,
     description,
-    amountUSD,
+    amount,
     transactionDate,
   });
 
@@ -67,6 +67,10 @@ exports.saveHistory = (req, res) => {
         status: 200,
         data: {
           message: "Transaction Successfully Saved",
+          user: {
+            userid: id,
+            phone,
+          },
         },
       });
     }
