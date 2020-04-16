@@ -234,7 +234,17 @@ exports.updateUserProfile = asyncHandler(async (req, res, next) => {
     id,
     { fullname, email },
     { new: true }
-  ).select("fullname email");
+  ).select("_id fullname email, phone");
+
+  // Sign token...
+  const token = jwt.sign(
+    {
+      id: userData._id,
+      phone,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "1y" }
+  );
 
   if (userData) {
     res.json({
@@ -242,6 +252,7 @@ exports.updateUserProfile = asyncHandler(async (req, res, next) => {
       data: {
         message: "User Information Updated Successfully!",
         user: userData,
+        token,
       },
     });
   } else {
