@@ -8,35 +8,36 @@ mongoose.Promise = global.Promise;
 
 const userSchema = new Schema({
   fullname: {
-    type: String
+    type: String,
   },
   email: {
     type: String,
     trim: true,
-    lowercase: true
+    lowercase: true,
   },
   phone: {
     type: String,
-    unique: true
+    unique: true,
   },
   addresses: [{ address: String, city: String, localgovt: String }],
   authCode: {
     type: String,
-    trim: true
+    trim: true,
   },
   role: String,
   status: {
     type: String,
     trim: true,
     required: true,
-    enum: ["pending", "incomplete", "active", "inactive"]
+    enum: ["pending", "incomplete", "active", "inactive"],
   },
+  otp_expiry: { type: Date, default: new Date() },
   created_at: { type: Date },
-  updated_at: Date
+  updated_at: Date,
 });
 
 // save middleware
-userSchema.pre("save", function(next) {
+userSchema.pre("save", function (next) {
   // get the current date
   var currentDate = new Date();
 
@@ -50,7 +51,7 @@ userSchema.pre("save", function(next) {
 });
 
 // update middleware
-userSchema.pre("update", function(next) {
+userSchema.pre("update", function (next) {
   // get the current date
   const currentDate = new Date();
 

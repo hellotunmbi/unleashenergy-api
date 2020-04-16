@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
 
 const historySchema = new Schema({
-  userid: { type: String, required: true, trim: true },
+  user_id: { type: String, required: true, trim: true },
   phone: {
     type: String,
     trim: true,

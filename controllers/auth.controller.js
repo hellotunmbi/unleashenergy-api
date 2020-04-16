@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const asyncHandler = require("../middlewares/async.middleware");
+const moment = require("moment");
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -58,12 +59,13 @@ exports.login = asyncHandler(async (req, res, next) => {
     });
   } else {
     const newOTP = generateOTP();
+    const otp_expiry = moment().add(1, "day");
 
     sendOTPSMS(phone, newOTP);
 
     const regenOTP = await User.findOneAndUpdate(
       { phone },
-      { authCode: newOTP }
+      { authCode: newOTP, otp_expiry }
     );
     res.json({
       status: 200,
@@ -95,13 +97,17 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
   // Check with your phone and otp
   // if found and status is not active, return message and status
   // If found and status is active, return message and user data
-  const verifiedOTP = await User.findOne({ phone, authCode: otp });
+  const verifiedOTP = await User.findOne({
+    phone,
+    authCode: otp,
+    otp_expiry: { $gte: Date.now() },
+  });
 
   if (!verifiedOTP) {
     res.json({
       status: 400,
       data: {
-        message: "Invalid OTP",
+        message: "Invalid OTP or OTP Expired",
       },
     });
   } else {
@@ -199,10 +205,18 @@ exports.resendOTP = asyncHandler(async (req, res, next) => {
   }
 
   sendOTPSMS(phone, otp);
+
+  res.json({
+    status: 200,
+    data: {
+      message: "OTP Resent",
+    },
+  });
 });
 
 // ---------------------------------------------------------
 // Send OTP SMS...
+
 sendOTPSMS = async (phone, otp) => {
   // Send OTP as SMS...
   var payload = {
@@ -214,12 +228,6 @@ sendOTPSMS = async (phone, otp) => {
   const smsSent = await jusibe.sendSMS(payload);
   console.log(`SMS SENT TO: ${phone}`, smsSent.body);
 };
-
-// customErrorHandler = (fields, errorMessage) => {
-//   if(typeof fields == Array) {
-
-//   }
-// }
 
 // ---------------------------------------------------------
 // Send Email Address...
