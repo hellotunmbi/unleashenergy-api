@@ -1,9 +1,11 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const asyncHandler = require("../middlewares/async.middleware");
+const ErrorResponse = require("../utils/errorResponse");
 const moment = require("moment");
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const emailService = require("../handlers/mail");
 
 const Jusibe = require("jusibe");
 
@@ -38,6 +40,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   if (!user) {
     // Generate OTP...
     const otp = Math.floor(1000 + Math.random() * 9000);
+    const otp_expiry = moment().add(1, "day");
 
     // Save to DB...
     const savedUser = await User.create({
@@ -45,6 +48,7 @@ exports.login = asyncHandler(async (req, res, next) => {
       status: "pending",
       role: "user",
       authCode: otp,
+      otp_expiry,
     });
 
     sendOTPSMS(phone, otp);
@@ -100,7 +104,7 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
   const verifiedOTP = await User.findOne({
     phone,
     authCode: otp,
-    otp_expiry: { $gte: Date.now() },
+    otp_expiry: { $gte: moment() },
   });
 
   if (!verifiedOTP) {
@@ -177,6 +181,8 @@ exports.register = asyncHandler(async (req, res, next) => {
     { expiresIn: "1y" }
   );
 
+  sendEmail("registration", email, fullname);
+
   res.json({
     status: 200,
     data: {
@@ -232,27 +238,22 @@ sendOTPSMS = async (phone, otp) => {
 // ---------------------------------------------------------
 // Send Email Address...
 
-exports.sendEmail = (req, res) => {
-  const recipient = req.body.recipient;
-  const msg = {
-    to: "hellotunmbi@gmail.com",
-    from: "Unleash Energy <info@unleashenergy.com>",
-    subject: "Test Email with Unleash",
-    text: "intro title header",
-    html: "This is a test email with Unleash Energy",
-  };
-  sgMail
-    .send(msg)
-    .then((sent) => {
-      res.json({
-        message: "Email Sent Successfully",
-      });
-    })
-    .catch((err) =>
-      res.json({
-        message: "Unable to send message",
-      })
-    );
+sendEmail = (mailType, recipient, fullname) => {
+  if (!recipient || !mailType || !fullname) {
+    console.log("Incomplete body parameters to send email");
+    return;
+  }
+
+  switch (mailType) {
+    case "registration":
+      emailService.sendRegistrationSuccessEmail(recipient, fullname);
+      break;
+    case "Papayas":
+      console.log("Mangoes and papayas are $2.79 a pound.");
+      break;
+    default:
+      console.log("No email available to be sent");
+  }
 };
 
 // ---------------------------------------------------------

@@ -1,30 +1,25 @@
-import { otpEmail, registerSuccessEmail } from "./email-templates";
+const { registerSuccessMessage } = require("./email-templates");
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const EmailService = {
-  sendOTPEmail(email, fullname, message) {
-    const { email, fullname } = req.body;
-    const msg = {
-      to: email,
-      from: {
-        email: "support@purpcoininvest.com",
-        name: "Purple Coin Investment"
-      },
-      subject: "Verify Your Email - Unleash Energy",
-      text: "Unleash Energy - Confirm Your Email",
-      html: `Dear ${fullname},<br/><br/>
-    				We have received your request to create an account on PurpCoin Invest App.<br/><br/>
-    				Kindly confirm your email to complete your registration process by clicking the button below:<br/><br/>
-    				<a href="#"><button style="padding: 1rem 2rem; font-size: 1rem; background-color: rgba(83, 28, 179, 0.57); color: #FFFFFF; border-radius: 4px">Verify Email</button></a>`
-    };
-    sgMail.send(msg);
+exports.sendRegistrationSuccessEmail = (email, fullname) => {
+  const msg = {
+    to: email,
+    from: {
+      email: "support@unleashenergy.com",
+      name: "Unleash Energy",
+    },
+    subject: "Registration Successful - Unleash Energy",
+    text: "Thank you for registering on Unleash Energy App",
+    html: registerSuccessMessage(fullname),
+  };
+  sgMail.send(msg);
 
-    res.json({
-      status: 200,
-      message: "Mail sent successfully!!"
-    });
-  }
+  console.log({
+    status: 200,
+    message: "Mail sent successfully!!",
+    recipient: email,
+  });
 };
 
-exports.default = EmailService;
+// exports.default = EmailService;
