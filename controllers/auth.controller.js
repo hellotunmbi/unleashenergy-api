@@ -37,7 +37,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   if (!user) {
     // Generate OTP...
-    const otp = Math.floor(Math.random() * 9000);
+    const otp = Math.floor(1000 + Math.random() * 9000);
 
     // Save to DB...
     const savedUser = await User.create({

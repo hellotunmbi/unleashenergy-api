@@ -14,7 +14,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.history = asyncHandler(async (req, res, next) => {
   const { id, phone } = req;
-  const history = await History.find({ userid: id, phone }).sort({
+  const history = await History.find({ user_id: id, phone }).sort({
     created_at: -1,
   });
 
