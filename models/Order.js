@@ -8,13 +8,14 @@ const orderSchema = new Schema({
   user_id: {
     type: Schema.Types.ObjectId,
     required: true,
+    ref: "User",
   },
   order_id: { type: String, required: true },
   address_id: {
     type: Schema.Types.ObjectId,
     required: true,
   },
-  cylinder_id: { type: Schema.Types.ObjectId },
+  cylinder_id: { type: Schema.Types.ObjectId, ref: "Cylinder" },
   paid: {
     type: Boolean,
   },

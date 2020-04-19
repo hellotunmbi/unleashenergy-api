@@ -5,16 +5,21 @@ const Schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
 
 const serviceSchema = new Schema({
-  userid: { type: Schema.Types.ObjectId, required: true, trim: true },
+  userid: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    trim: true,
+    ref: "User",
+  },
   category: { type: String, required: true },
   description: { type: String, required: true },
   status: { type: String, required: true },
   created_at: Date,
-  updated_at: Date
+  updated_at: Date,
 });
 
 // save middleware
-serviceSchema.pre("save", function(next) {
+serviceSchema.pre("save", function (next) {
   // get the current date
   var currentDate = new Date();
 
@@ -28,7 +33,7 @@ serviceSchema.pre("save", function(next) {
 });
 
 // update middleware
-serviceSchema.pre("update", function(next) {
+serviceSchema.pre("update", function (next) {
   // get the current date
   var currentDate = new Date();
 

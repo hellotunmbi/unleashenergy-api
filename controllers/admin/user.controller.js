@@ -48,7 +48,7 @@ exports.updateUser = asyncHandler(async (req, res) => {
 });
 
 // ---------------------------------------------------------
-//Get User Transaction...
+//Get User Transaction...ADMIN
 
 exports.history = asyncHandler(async (req, res, next) => {
   const { id, phone } = req.params;
@@ -72,6 +72,41 @@ exports.history = asyncHandler(async (req, res, next) => {
       },
     });
   }
+});
+
+// ---------------------------------------------------------
+// Get All Orders...ADMIN
+
+exports.allOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find({})
+    .populate("user_id")
+    .populate("cylinder_id")
+    .sort({ created_at: -1 });
+
+  res.json({
+    status: 200,
+    data: {
+      message: "Order Found",
+      orders,
+    },
+  });
+});
+
+// ---------------------------------------------------------
+// Get All Services...ADMIN
+
+exports.allServices = asyncHandler(async (req, res) => {
+  const services = await Services.find({})
+    .populate("userid")
+    .sort({ created_at: -1 });
+
+  res.json({
+    status: 200,
+    data: {
+      message: "Services Found",
+      services,
+    },
+  });
 });
 
 // ---------------------------------------------------------

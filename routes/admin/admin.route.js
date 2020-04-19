@@ -4,7 +4,11 @@ const router = express.Router();
 const authMiddleware = require("../../middlewares/auth.middleware");
 const adminUserController = require("../../controllers/admin/user.controller");
 
-router.get("/", adminUserController.allUsers);
+router.get("/users", adminUserController.allUsers);
+
+router.get("/orders", adminUserController.allOrders);
+
+router.get("/services", adminUserController.allServices);
 
 router.post("/", adminUserController.updateUser);
 
