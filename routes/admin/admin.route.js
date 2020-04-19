@@ -10,6 +10,8 @@ router.get("/orders", adminUserController.allOrders);
 
 router.get("/services", adminUserController.allServices);
 
+router.get("/payments", adminUserController.allPayments);
+
 router.post("/", adminUserController.updateUser);
 
 // History

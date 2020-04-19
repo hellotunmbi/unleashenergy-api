@@ -93,6 +93,24 @@ exports.allOrders = asyncHandler(async (req, res) => {
 });
 
 // ---------------------------------------------------------
+// Get All Payments...ADMIN
+
+exports.allPayments = asyncHandler(async (req, res) => {
+  const payments = await Order.find({ status: "paid" })
+    .populate("user_id")
+    .populate("cylinder_id")
+    .sort({ updated_at: -1 });
+
+  res.json({
+    status: 200,
+    data: {
+      message: "Payments Found",
+      payments,
+    },
+  });
+});
+
+// ---------------------------------------------------------
 // Get All Services...ADMIN
 
 exports.allServices = asyncHandler(async (req, res) => {
