@@ -4,7 +4,7 @@ const asyncHandler = require("../middlewares/async.middleware");
 const ErrorResponse = require("../utils/errorResponse");
 const moment = require("moment");
 const sgMail = require("@sendgrid/mail");
-const https = require("https");
+const axios = require("axios");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const emailService = require("../handlers/mail");
@@ -240,12 +240,13 @@ sendOTPSMS = async (phone, otp) => {
 
   const smsURL = `http://www.smslive247.com/http/index.aspx?cmd=sendmsg&sessionid=bc655dce-9971-4897-bf5b-fd997d271fe8&message=${message}&sender=Unleash&sendto=${phone}&msgtype=0`;
 
-  https
-    .get(smsURL, (resp) => {
+  axios
+    .get(smsURL)
+    .then((response) => {
       console.log(`SMS SENT TO: ${phone}`);
     })
-    .on("error", (err) => {
-      console.log("Error on Sending SS: " + err.message);
+    .catch((error) => {
+      console.log("ERROR IN SENDING SMS::", error);
     });
 };
 
