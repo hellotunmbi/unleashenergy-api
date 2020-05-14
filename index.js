@@ -38,6 +38,7 @@ const user = require("./routes/user.route");
 const settings = require("./routes/settings.route");
 const verify = require("./routes/verify.route");
 const cylinder = require("./routes/cylinder.route");
+const products = require("./routes/products.route");
 // Admin Routes...
 const admin = require("./routes/admin/admin.route");
 
@@ -50,6 +51,7 @@ app.use("/api/user", user);
 app.use("/api/settings", settings);
 app.use("/api/verify", verify);
 app.use("/api/cylinder", cylinder);
+app.use("/api/products", products);
 
 app.use("/api/admin", admin);
 
