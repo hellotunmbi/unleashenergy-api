@@ -186,7 +186,7 @@ exports.register = asyncHandler(async (req, res, next) => {
     { expiresIn: "1y" }
   );
 
-  const hostURL = "https://unleash-api.herokuapp.com/api/verify/";
+  const hostURL = "https://unleashenergy-api.herokuapp.com/api/verify/";
 
   const msg = {
     to: email,
