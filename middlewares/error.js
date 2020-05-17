@@ -1,6 +1,6 @@
 const errorHandler = (err, req, res, next) => {
   // Log to console for dev
-  // console.log("My stacktrace", err.stack);
+  console.log("<<<<<My stacktrace>>>>", err.stack);
 
   console.log(`Custom Error: ${err.name}`);
 

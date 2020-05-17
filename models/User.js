@@ -9,15 +9,18 @@ mongoose.Promise = global.Promise;
 const userSchema = new Schema({
   fullname: {
     type: String,
+    required: true,
   },
   email: {
     type: String,
     trim: true,
     lowercase: true,
+    unique: true,
+    required: true,
+    validate: [validator.isEmail, "Invalid Email Address"],
   },
   phone: {
     type: String,
-    unique: true,
   },
   addresses: [{ address: String, city: String, localgovt: String }],
   authCode: {
@@ -29,6 +32,7 @@ const userSchema = new Schema({
     type: String,
     trim: true,
     required: true,
+    default: "pending",
     enum: ["pending", "incomplete", "active", "inactive"],
   },
   otp_expiry: { type: Date, default: new Date() },
@@ -64,7 +68,7 @@ userSchema.pre("update", function (next) {
   next();
 });
 
-userSchema.plugin(passportLocalMongoose, { usernameField: "phone" });
+userSchema.plugin(passportLocalMongoose, { usernameField: "email" });
 userSchema.plugin(mongodbErrorHandler);
 
 module.exports = mongoose.model("User", userSchema);

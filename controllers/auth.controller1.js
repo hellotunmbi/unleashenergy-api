@@ -1,4 +1,3 @@
-const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const asyncHandler = require("../middlewares/async.middleware");
@@ -23,59 +22,66 @@ const jusibe = new Jusibe(
 // LOGIN USER...
 
 exports.login = asyncHandler(async (req, res, next) => {
-  passport.authenticate("local", function (err, user, info) {
-    if (err) {
-      return next(err);
-    }
+  const phone = req.body.phone;
 
-    const { fullname, email, phone, status } = user;
-    const id = user._id;
+  // Check if phone is sent from API
+  if (!phone) {
+    res.json({
+      status: 400,
+      data: {
+        message: "phone number required",
+      },
+    });
+    return;
+  }
 
-    if (!user) {
-      res.json({
-        status: 400,
-        data: {
-          message: "Invalid Login Credentials",
-          err,
-        },
-      });
-    } else if (status === "pending") {
-      res.json({
-        status: 401,
-        data: {
-          message:
-            "Account Not Verified. Check your email for Verification Link",
-        },
-      });
-    } else if (status === "active") {
-      const token = jwt.sign(
-        {
-          id,
-          phone,
-          email,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "1w" }
-      );
+  const user = await User.findOne({ phone: phone });
 
-      res.json({
-        status: 200,
-        data: {
-          message: "Successfully Logged In",
-          user,
-          token,
-          info,
-        },
-      });
-    } else {
-      res.json({
-        status: 400,
-        data: {
-          message: "User cannot be authenticated.",
-        },
-      });
-    }
-  })(req, res, next);
+  console.log("User", user);
+
+  if (!user) {
+    // Generate OTP...
+    const otp = Math.floor(1000 + Math.random() * 9000);
+    const otp_expiry = moment().add(1, "day");
+
+    // Save to DB...
+    const savedUser = await User.create({
+      phone: phone,
+      status: "pending",
+      role: "user",
+      authCode: otp,
+      otp_expiry,
+    });
+
+    sendOTPSMS(phone, otp);
+
+    res.json({
+      status: 200,
+      data: {
+        message: "User registered",
+        phone,
+      },
+      // sms: smsSent.body
+    });
+  } else {
+    const newOTP = generateOTP();
+    const otp_expiry = moment().add(1, "day");
+
+    sendOTPSMS(phone, newOTP);
+
+    const regenOTP = await User.findOneAndUpdate(
+      { phone },
+      { authCode: newOTP, otp_expiry }
+    );
+    res.json({
+      status: 200,
+      data: {
+        message: "User found but needs to login",
+        phone,
+      },
+    });
+    // }
+  }
 });
 
 // ---------------------------------------------------------
@@ -172,8 +178,8 @@ exports.register = asyncHandler(async (req, res, next) => {
   };
 
   let user = new User(userData);
-  await User.register(user, req.body.password);
 
+  await User.register(user, req.body.password);
   const id = user._id;
 
   const token = jwt.sign(

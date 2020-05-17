@@ -4,7 +4,12 @@ const validator = require("validator");
 const Schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
 
-const productSchema = new Schema({
+const purchaseSchema = new Schema({
+  user_id: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
+  },
   imageURL: { type: String },
   title: {
     type: String,
@@ -18,18 +23,29 @@ const productSchema = new Schema({
     type: [{ type: String }],
   },
   quantity: { type: Number },
+  payment_method: {
+    type: String,
+    required: true,
+  },
+  phone: { type: Number },
   status: {
     type: String,
     trim: true,
     required: true,
-    enum: ["active", "inactive"],
+    enum: ["pending", "paid", "failed", "inactive"],
   },
+  paid: {
+    type: Boolean,
+  },
+  transaction: String,
+  trxref: String,
+  reference: String,
   created_at: { type: Date },
   updated_at: Date,
 });
 
 // save middleware
-productSchema.pre("save", function (next) {
+purchaseSchema.pre("save", function (next) {
   // get the current date
   var currentDate = new Date();
 
@@ -43,7 +59,7 @@ productSchema.pre("save", function (next) {
 });
 
 // update middleware
-productSchema.pre("update", function (next) {
+purchaseSchema.pre("update", function (next) {
   // get the current date
   const currentDate = new Date();
 
@@ -56,4 +72,4 @@ productSchema.pre("update", function (next) {
   next();
 });
 
-module.exports = mongoose.model("Products", productSchema);
+module.exports = mongoose.model("Purchases", purchaseSchema);

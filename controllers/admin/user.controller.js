@@ -372,3 +372,5 @@ exports.updateUserProfile = asyncHandler(async (req, res, next) => {
     });
   }
 });
+
+// PRODUCTS SECTION .....

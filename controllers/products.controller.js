@@ -1,4 +1,6 @@
+const Purchases = require("../models/Purchases");
 const Products = require("../models/Product");
+const History = require("../models/History");
 const asyncHandler = require("../middlewares/async.middleware");
 const ErrorResponse = require("../utils/errorResponse");
 
@@ -160,3 +162,62 @@ exports.removeProduct = asyncHandler(async (req, res, next) => {
 });
 
 // ---------------------------------------------------------
+
+exports.purchaseProduct = asyncHandler(async (req, res, next) => {
+  const user_id = req.id;
+  const { title, price, payment_method, phone, status } = req.body;
+
+  if (!title || !price || !payment_method || !status || !user_id) {
+    return next(new ErrorResponse("Incomplete parameters", 400));
+  }
+
+  const productPurchased = await Purchases.create(
+    Object.assign(req.body, { user_id })
+  );
+
+  const saveToHistory = await History.create({
+    user_id,
+    phone,
+    description: title,
+    amount: price,
+    transactionDate: Date.now(),
+    status,
+  });
+
+  if (productPurchased) {
+    res.json({
+      status: 200,
+      data: {
+        message: "Product Purchase Successful",
+        productPurchase: productPurchased,
+      },
+    });
+  } else {
+    return next(new ErrorResponse("Error in purchasing product", 400));
+  }
+});
+
+// ---------------------------------------------------------
+// List Purchases
+exports.allPurchases = asyncHandler(async (req, res, next) => {
+  const purchases = await Purchases.find({})
+    .populate("user_id")
+    .sort({ created_at: "desc" });
+
+  if (purchases.length === 0) {
+    res.json({
+      status: 200,
+      data: {
+        message: "No purchase found",
+      },
+    });
+  } else if (purchases.length > 0) {
+    res.json({
+      status: 200,
+      data: {
+        message: "Purchases Found",
+        purchases,
+      },
+    });
+  }
+});
