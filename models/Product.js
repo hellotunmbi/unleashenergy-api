@@ -6,6 +6,7 @@ mongoose.Promise = global.Promise;
 
 const productSchema = new Schema({
   imageURL: { type: String },
+  imagePublicURL: { type: String },
   title: {
     type: String,
     required: true,

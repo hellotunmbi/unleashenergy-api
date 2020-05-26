@@ -83,7 +83,7 @@ exports.updateProduct = asyncHandler(async (req, res, next) => {
 
   const products = await Products.findByIdAndUpdate(
     id,
-    { $set: req.body },
+    { $set: req.body.product },
     { new: true }
   );
 
@@ -104,7 +104,16 @@ exports.updateProduct = asyncHandler(async (req, res, next) => {
 
 // Add a new product
 exports.addProduct = asyncHandler(async (req, res, next) => {
-  const { imageURL, title, price, description, category, quantity } = req.body;
+  const {
+    imageURL,
+    title,
+    price,
+    description,
+    category,
+    quantity,
+    public_url,
+    status,
+  } = req.body;
 
   if (!title || !price) {
     return next(
@@ -119,6 +128,8 @@ exports.addProduct = asyncHandler(async (req, res, next) => {
     description,
     category,
     quantity,
+    public_url,
+    status,
   });
 
   if (!product) {
@@ -221,3 +232,13 @@ exports.allPurchases = asyncHandler(async (req, res, next) => {
     });
   }
 });
+
+// ==================
+exports.uploadImage = (req, res) => {
+  console.log(req.file);
+
+  res.json({
+    image_url: req.file.url,
+    public_id: req.file.public_id,
+  });
+};

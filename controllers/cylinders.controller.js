@@ -13,8 +13,8 @@ exports.allCylinders = asyncHandler(async (req, res, next) => {
       status: 200,
       data: {
         message: "Cylinders Found",
-        cylinders
-      }
+        cylinders,
+      },
     });
   }
 });
@@ -31,8 +31,8 @@ exports.updateCylinder = asyncHandler(async (req, res, next) => {
       status: 200,
       data: {
         message: "Cylinders Found",
-        cylinders
-      }
+        cylinders,
+      },
     });
   }
 });
@@ -51,7 +51,7 @@ exports.addCylinders = asyncHandler(async (req, res, next) => {
     quantity,
     imageURL,
     dimension,
-    price
+    price,
   });
 
   if (!cylinders) {
@@ -61,8 +61,8 @@ exports.addCylinders = asyncHandler(async (req, res, next) => {
     status: 200,
     data: {
       message: "New Cylinder Added",
-      cylinders
-    }
+      cylinders,
+    },
   });
 });
 
@@ -81,7 +81,26 @@ exports.cylinderDetails = asyncHandler(async (req, res, next) => {
     status: 200,
     data: {
       message: "Cylinder details retrieved",
-      cylinder
-    }
+      cylinder,
+    },
   });
+});
+
+// ---------------------------------------------------------
+
+exports.deleteCylinder = asyncHandler(async (req, res, next) => {
+  const id = req.body.id;
+
+  const deleted = await Cylinders.findByIdAndDelete(id);
+
+  if (!deleted) {
+    return next(new ErrorResponse("Unable to delete cylinder", 400));
+  } else {
+    res.json({
+      status: 200,
+      data: {
+        message: "Cylinder Deleted",
+      },
+    });
+  }
 });
