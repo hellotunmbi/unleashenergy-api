@@ -22,16 +22,22 @@ exports.allCylinders = asyncHandler(async (req, res, next) => {
 // ---------------------------------------------------------
 
 exports.updateCylinder = asyncHandler(async (req, res, next) => {
-  const cylinders = await Cylinders.find({});
+  const id = req.params.id;
 
-  if (cylinders.length === 0) {
-    return next(new ErrorResponse("No cylinder found", 400));
-  } else if (cylinders.length > 0) {
+  const cylinder = await Cylinders.findByIdAndUpdate(
+    id,
+    { $set: req.body.cylinder },
+    { new: true }
+  );
+
+  if (!cylinder) {
+    return next(new ErrorResponse("No cylinder updated", 400));
+  } else {
     res.json({
       status: 200,
       data: {
-        message: "Cylinders Found",
-        cylinders,
+        message: "Cylinder updated successfully",
+        cylinder,
       },
     });
   }
@@ -89,7 +95,7 @@ exports.cylinderDetails = asyncHandler(async (req, res, next) => {
 // ---------------------------------------------------------
 
 exports.deleteCylinder = asyncHandler(async (req, res, next) => {
-  const id = req.body.id;
+  const id = req.params.id;
 
   const deleted = await Cylinders.findByIdAndDelete(id);
 
