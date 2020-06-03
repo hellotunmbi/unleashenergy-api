@@ -6,6 +6,7 @@ const ErrorResponse = require("../utils/errorResponse");
 const moment = require("moment");
 const sgMail = require("@sendgrid/mail");
 const axios = require("axios");
+const Helper = require("../helpers");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const emailService = require("../handlers/mail");
@@ -28,7 +29,7 @@ exports.login = asyncHandler(async (req, res, next) => {
       return next(err);
     }
 
-    const { fullname, email, phone, status } = user;
+    const { fullname, email, phone, status, role } = user;
     const id = user._id;
 
     if (!user) {
@@ -39,7 +40,7 @@ exports.login = asyncHandler(async (req, res, next) => {
           err,
         },
       });
-    } else if (status === "pending") {
+    } else if (status === "pending" && role === "user") {
       res.json({
         status: 401,
         data: {
@@ -47,16 +48,9 @@ exports.login = asyncHandler(async (req, res, next) => {
             "Account Not Verified. Check your email for Verification Link",
         },
       });
-    } else if (status === "active") {
-      const token = jwt.sign(
-        {
-          id,
-          phone,
-          email,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "1w" }
-      );
+    } else if (status === "active" && role === "user") {
+      // Generate token...
+      const token = Helper.generateToken(id, phone, email, role);
 
       res.json({
         status: 200,
@@ -121,14 +115,8 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
       });
       return;
     } else if (verifiedOTP["status"] && verifiedOTP["status"] === "active") {
-      const token = jwt.sign(
-        {
-          id: verifiedOTP._id,
-          phone,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "1y" }
-      );
+      // TODO: Generate token here...
+
       res.json({
         status: 200,
         data: {
@@ -154,6 +142,7 @@ exports.verifyOTP = asyncHandler(async (req, res, next) => {
 exports.register = asyncHandler(async (req, res, next) => {
   const { fullname, email, phone } = req.body;
   const status = "pending";
+  const role = "user";
 
   if (!fullname || !email) {
     res.json({
@@ -169,6 +158,7 @@ exports.register = asyncHandler(async (req, res, next) => {
     email,
     phone,
     status,
+    role,
   };
 
   let user = new User(userData);
@@ -176,15 +166,18 @@ exports.register = asyncHandler(async (req, res, next) => {
 
   const id = user._id;
 
-  const token = jwt.sign(
-    {
-      id,
-      phone,
-      email,
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "1y" }
-  );
+  // Generate token...
+  const token = Helper.generateToken(id, phone, email, role);
+  // const token = jwt.sign(
+  //   {
+  //     id,
+  //     phone,
+  //     email,
+  //     role,
+  //   },
+  //   process.env.JWT_SECRET,
+  //   { expiresIn: "1y" }
+  // );
 
   const hostURL = "https://unleashenergy-api.herokuapp.com/api/verify/";
 
@@ -246,7 +239,7 @@ exports.resendOTP = asyncHandler(async (req, res, next) => {
 // Send OTP SMS...
 
 sendOTPSMS = async (phone, otp) => {
-  // Send OTP as SMS...
+  // Send OTP as SMS using Jusibe...
   // var payload = {
   //   to: phone,
   //   from: "Unleash Energy",

@@ -251,17 +251,11 @@ exports.updateUserProfile = asyncHandler(async (req, res, next) => {
     id,
     { fullname, email },
     { new: true }
-  ).select("_id fullname email, phone");
+  ).select("_id fullname email phone role");
 
+  const { _id, phone, role } = userData;
   // Sign token...
-  const token = jwt.sign(
-    {
-      id: userData._id,
-      phone,
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "1y" }
-  );
+  const token = Helper.generateToken(id, phone, email, role);
 
   if (userData) {
     res.json({

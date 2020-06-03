@@ -1,3 +1,4 @@
+const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const History = require("../../models/History");
 const User = require("../../models/User");
@@ -5,9 +6,51 @@ const Order = require("../../models/Order");
 const Services = require("../../models/Services");
 const asyncHandler = require("../../middlewares/async.middleware");
 const ErrorResponse = require("../../utils/errorResponse");
+const Helper = require("../../helpers");
 
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+exports.loginAdmin = asyncHandler(async (req, res, next) => {
+  passport.authenticate("local", function (err, user, info) {
+    if (err) {
+      return next(err);
+    }
+
+    const { fullname, email, phone, status, role } = user;
+    const id = user._id;
+
+    if (!user) {
+      res.json({
+        status: 400,
+        data: {
+          message: "Invalid Login Credentials",
+          err,
+        },
+      });
+    } else if (status === "active" && role === "admin") {
+      // Generate token...
+      const token = Helper.generateToken(id, phone, email, role);
+
+      res.json({
+        status: 200,
+        data: {
+          message: "Successfully Logged In",
+          user,
+          token,
+          info,
+        },
+      });
+    } else {
+      res.json({
+        status: 400,
+        data: {
+          message: "User cannot be authenticated.",
+        },
+      });
+    }
+  })(req, res, next);
+});
 
 // ---------------------------------------------------------
 // Get All Users...
@@ -172,41 +215,6 @@ exports.saveHistory = (req, res) => {
 };
 
 // ---------------------------------------------------------
-// Add Address...
-
-exports.addAddress = asyncHandler(async (req, res, next) => {
-  const { address, city, localgovt } = req.body;
-  const { id, phone } = req;
-
-  if (!address || !city || !localgovt || !id || !phone) {
-    return next(
-      new ErrorResponse(
-        "Expecting address,city and localgovt but got incomplete data",
-        400
-      )
-    );
-  }
-
-  const newAddess = {
-    address,
-    city,
-    localgovt,
-  };
-
-  const addressAdded = await User.findOneAndUpdate(
-    { _id: id, phone },
-    { $push: { addresses: newAddess } }
-  );
-
-  res.json({
-    status: 200,
-    data: {
-      message: "Address added successfully",
-    },
-  });
-});
-
-// ---------------------------------------------------------
 // Get User Address...
 
 exports.getUserAddress = asyncHandler(async (req, res, next) => {
@@ -342,17 +350,11 @@ exports.updateUserProfile = asyncHandler(async (req, res, next) => {
     id,
     { fullname, email },
     { new: true }
-  ).select("_id fullname email, phone");
+  ).select("_id fullname email phone role");
 
+  const { phone, role } = userData;
   // Sign token...
-  const token = jwt.sign(
-    {
-      id: userData._id,
-      phone,
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "1y" }
-  );
+  const token = Helper.generateToken(id, phone, email, role);
 
   if (userData) {
     res.json({

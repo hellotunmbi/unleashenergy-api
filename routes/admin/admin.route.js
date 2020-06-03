@@ -5,7 +5,7 @@ const cloudinary = require("cloudinary");
 const cloudinaryStorage = require("multer-storage-cloudinary");
 
 const authMiddleware = require("../../middlewares/auth.middleware");
-const adminUserController = require("../../controllers/admin/user.controller");
+const adminUserController = require("../../controllers/admin/admin.controller");
 const productsController = require("../../controllers/products.controller");
 const cylinderController = require("../../controllers/cylinders.controller");
 
@@ -39,40 +39,100 @@ const cylinderUploadParser = multer({ storage: cylinderStorage });
 
 // ================
 
-router.get("/users", adminUserController.allUsers);
+router.post("/auth/login", adminUserController.loginAdmin);
 
-router.get("/orders", adminUserController.allOrders);
+// ================
 
-router.get("/services", adminUserController.allServices);
+router.get(
+  "/users",
+  authMiddleware.verifyAdminToken,
+  adminUserController.allUsers
+);
 
-router.get("/payments", adminUserController.allPayments);
+router.get(
+  "/orders",
+  authMiddleware.verifyAdminToken,
+  adminUserController.allOrders
+);
 
-router.post("/", adminUserController.updateUser);
+router.get(
+  "/services",
+  authMiddleware.verifyAdminToken,
+  adminUserController.allServices
+);
+
+router.get(
+  "/payments",
+  authMiddleware.verifyAdminToken,
+  adminUserController.allPayments
+);
+
+// router.post("/", adminUserController.updateUser);
 
 // History
-router.post("/transactions/:id/:phone", adminUserController.history);
+router.post(
+  "/transactions/:id/:phone",
+  authMiddleware.verifyAdminToken,
+  adminUserController.history
+);
 
 // ===============================
 // Products - Marketplace
-router.get("/product", productsController.allProducts); //TODO: Add Admin Middleware
+router.get(
+  "/product",
+  authMiddleware.verifyAdminToken,
+  productsController.allProducts
+); //TODO: Add Admin Middleware
 
-router.get("/product/:id", productsController.productDetails); //TODO: Add Admin Middleware
+router.get(
+  "/product/:id",
+  authMiddleware.verifyAdminToken,
+  productsController.productDetails
+); //TODO: Add Admin Middleware
 
-router.post("/product", productsController.addProduct); //TODO: Add Admin Middleware
+router.post(
+  "/product",
+  authMiddleware.verifyAdminToken,
+  productsController.addProduct
+); //TODO: Add Admin Middleware
 
-router.delete("/product/:id", productsController.removeProduct); //TODO: Add Admin Middleware
+router.delete(
+  "/product/:id",
+  authMiddleware.verifyAdminToken,
+  productsController.removeProduct
+); //TODO: Add Admin Middleware
 
-router.patch("/product/:id", productsController.updateProduct); //TODO: Add Admin Middleware
+router.patch(
+  "/product/:id",
+  authMiddleware.verifyAdminToken,
+  productsController.updateProduct
+); //TODO: Add Admin Middleware
 
 // ===============================
 // Products - Marketplace
-router.post("/cylinder", cylinderController.addCylinders); //TODO: Add Admin Middleware
+router.post(
+  "/cylinder",
+  authMiddleware.verifyAdminToken,
+  cylinderController.addCylinders
+); //TODO: Add Admin Middleware
 
-router.delete("/cylinder/:id", cylinderController.deleteCylinder); //TODO: Add Admin Middleware
+router.delete(
+  "/cylinder/:id",
+  authMiddleware.verifyAdminToken,
+  cylinderController.deleteCylinder
+); //TODO: Add Admin Middleware
 
-router.get("/cylinder/:id", cylinderController.cylinderDetails);
+router.get(
+  "/cylinder/:id",
+  authMiddleware.verifyAdminToken,
+  cylinderController.cylinderDetails
+);
 
-router.patch("/cylinder/:id", cylinderController.updateCylinder); //TODO: Add Admin Middleware
+router.patch(
+  "/cylinder/:id",
+  authMiddleware.verifyAdminToken,
+  cylinderController.updateCylinder
+); //TODO: Add Admin Middleware
 
 // ==============
 // POST IMAGE TO CLOUDINARY
