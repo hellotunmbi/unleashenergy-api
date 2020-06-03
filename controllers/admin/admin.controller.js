@@ -56,7 +56,7 @@ exports.loginAdmin = asyncHandler(async (req, res, next) => {
 // Get All Users...
 
 exports.allUsers = asyncHandler(async (req, res) => {
-  const users = await User.find({});
+  const users = await User.find({ role: { $ne: "admin" } });
 
   res.json({
     status: 200,
