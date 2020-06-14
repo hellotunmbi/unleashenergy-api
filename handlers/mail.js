@@ -6,7 +6,7 @@ exports.sendRegistrationSuccessEmail = (email, fullname) => {
   const msg = {
     to: email,
     from: {
-      email: "support@unleashenergy.com",
+      email: "support@unleashenergyapp.com",
       name: "Unleash Energy",
     },
     subject: "Registration Successful - Unleash Energy",
@@ -26,7 +26,7 @@ exports.sendVerifyEmailMessage = (email, fullname) => {
   const msg = {
     to: email,
     from: {
-      email: "support@unleashenergy.com",
+      email: "support@unleashenergyapp.com",
       name: "Unleash Energy",
     },
     subject: "Verify Your Email - Unleash Energy",

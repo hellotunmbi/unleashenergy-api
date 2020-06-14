@@ -179,12 +179,12 @@ exports.register = asyncHandler(async (req, res, next) => {
   //   { expiresIn: "1y" }
   // );
 
-  const hostURL = "https://unleashenergy-api.herokuapp.com/api/verify/";
+  const hostURL = "http://api.unleashenergyapp.com/api/verify/";
 
   const msg = {
     to: email,
     from: {
-      email: "support@unleashenergy.com",
+      email: "support@unleashenergyapp.com",
       name: "Unleash Energy",
     },
     subject: "Verify Your Email - Unleash Energy",

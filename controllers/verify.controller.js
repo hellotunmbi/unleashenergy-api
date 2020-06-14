@@ -27,7 +27,7 @@ exports.confirmUserAccount = (req, res) => {
               to: email,
               from: {
                 name: "Unleash Energy",
-                email: "support@unleashenergy.com",
+                email: "support@unleashenergyapp.com",
               },
               subject: "Welcome to Unleash Energy",
               text: "Welcome to Unleash Energy",
