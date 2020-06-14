@@ -6,7 +6,9 @@ const ErrorResponse = require("../utils/errorResponse");
 
 // List all Products
 exports.allProducts = asyncHandler(async (req, res, next) => {
-  const products = await Products.find({}).sort({ created_at: "desc" });
+  const products = await Products.find({ status: "active" }).sort({
+    created_at: "desc",
+  });
 
   if (products.length === 0) {
     res.json({

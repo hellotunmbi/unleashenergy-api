@@ -81,7 +81,7 @@ router.post(
 router.get(
   "/product",
   authMiddleware.verifyAdminToken,
-  productsController.allProducts
+  adminUserController.allProductsAdmin
 ); //TODO: Add Admin Middleware
 
 router.get(

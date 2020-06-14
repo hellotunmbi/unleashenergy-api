@@ -376,3 +376,24 @@ exports.updateUserProfile = asyncHandler(async (req, res, next) => {
 });
 
 // PRODUCTS SECTION .....
+// List all Products
+exports.allProductsAdmin = asyncHandler(async (req, res, next) => {
+  const products = await Products.find({}).sort({ created_at: "desc" });
+
+  if (products.length === 0) {
+    res.json({
+      status: 200,
+      data: {
+        message: "No product found",
+      },
+    });
+  } else if (products.length > 0) {
+    res.json({
+      status: 200,
+      data: {
+        message: "Products Found",
+        products,
+      },
+    });
+  }
+});
