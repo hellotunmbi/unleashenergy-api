@@ -4,7 +4,21 @@ const errorHandler = (err, req, res, next) => {
 
   console.log(`Custom Error: ${err.name}`);
 
+  if (err.name && err.name === "UserExistsError") {
+    res.status(501).json({
+      success: false,
+      status: 501,
+      data: {
+        message: "Email already exist. Use another",
+        error: "Email already exist. Use another",
+      },
+    });
+
+    return;
+  }
+
   const statusCode = err.statusCode || 500;
+
   res.status(statusCode).json({
     success: false,
     status: statusCode,

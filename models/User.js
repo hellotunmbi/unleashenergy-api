@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const passportLocalMongoose = require("passport-local-mongoose");
 const mongodbErrorHandler = require("mongoose-mongodb-errors");
 const validator = require("validator");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const Schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
@@ -69,6 +70,7 @@ userSchema.pre("update", function (next) {
 });
 
 userSchema.plugin(passportLocalMongoose, { usernameField: "email" });
-userSchema.plugin(mongodbErrorHandler);
+// userSchema.plugin(mongodbErrorHandler);
+userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model("User", userSchema);

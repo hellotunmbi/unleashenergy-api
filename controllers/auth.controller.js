@@ -168,16 +168,6 @@ exports.register = asyncHandler(async (req, res, next) => {
 
   // Generate token...
   const token = Helper.generateToken(id, phone, email, role);
-  // const token = jwt.sign(
-  //   {
-  //     id,
-  //     phone,
-  //     email,
-  //     role,
-  //   },
-  //   process.env.JWT_SECRET,
-  //   { expiresIn: "1y" }
-  // );
 
   const hostURL = "http://api.unleashenergyapp.com/api/verify/";
 
