@@ -166,9 +166,6 @@ exports.register = asyncHandler(async (req, res, next) => {
 
   const id = user._id;
 
-  // Generate token...
-  const token = Helper.generateToken(id, phone, email, role);
-
   const hostURL = "http://api.unleashenergyapp.com/api/verify/";
 
   const msg = {
@@ -193,7 +190,6 @@ exports.register = asyncHandler(async (req, res, next) => {
     data: {
       message: "User successfully registered",
       user,
-      token,
     },
   });
 });
