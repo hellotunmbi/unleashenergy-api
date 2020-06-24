@@ -15,23 +15,24 @@ exports.confirmUserAccount = (req, res) => {
       function (err, user) {
         if (err) {
           res.send('<h3 style="margin: 2rem;"> Unable to verify email </h3>');
+          return;
+        }
+        if (!user) {
+          res.send(
+            '<h3 style="margin: 2rem;">Your email has already been verified</h3>'
+          );
         } else {
-          if (!user) {
-            res.send(
-              '<h3 style="margin: 2rem;">Your email has already been verified</h3>'
-            );
-          } else {
-            const { fullname, email } = user;
+          const { fullname, email } = user;
 
-            const msg = {
-              to: email,
-              from: {
-                name: "Unleash Energy",
-                email: "support@unleashenergyapp.com",
-              },
-              subject: "Welcome to Unleash Energy",
-              text: "Welcome to Unleash Energy",
-              html: `<div><img src="https://res.cloudinary.com/dlfaitrcf/image/upload/v1580859728/man-in-blue-suit-999267_g5wkho.jpg" /></div><br/>
+          const msg = {
+            to: email,
+            from: {
+              name: "Unleash Energy",
+              email: "support@unleashenergyapp.com",
+            },
+            subject: "Welcome to Unleash Energy",
+            text: "Welcome to Unleash Energy",
+            html: `<div><img src="https://res.cloudinary.com/dlfaitrcf/image/upload/v1580859728/man-in-blue-suit-999267_g5wkho.jpg" /></div><br/>
 						Dear ${fullname},<br/><br/>
             Thank you for registering on the Unleash Energy App.<br/><br/>
             Our services includes:<br/><br/>
@@ -43,15 +44,14 @@ exports.confirmUserAccount = (req, res) => {
             </ul><br/><br/>
             All these services can be performed on our Unleash Energy app, available on Playstore(Android) and Appstore(iOS)<br/><br/>
             `,
-            };
-            sgMail.send(msg);
+          };
+          sgMail.send(msg);
 
-            res.send(
-              '<h3 style="margin: 2rem;"> Email Successfully Verified.<br/>You can login to the Unleash Energy app</h3>'
-            );
-          }
-          // res.json(user);
+          res.send(
+            '<h3 style="margin: 2rem;"> Email Successfully Verified.<br/>You can login to the Unleash Energy app</h3>'
+          );
         }
+        // res.json(user);
       }
     );
   }

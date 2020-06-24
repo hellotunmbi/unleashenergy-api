@@ -22,6 +22,7 @@ const userSchema = new Schema({
   },
   phone: {
     type: String,
+    required: true,
   },
   addresses: [{ address: String, city: String, localgovt: String }],
   authCode: {
